@@ -10,8 +10,10 @@
 /Tools/*/Release/
 /Tools/*/Debug Global/
 /Tools/*/Release Global/
-/Release/
-/Debug/
+Release/
+Debug/
+Release/*
+Debug/*
 *.vcxproj.user
 /Debug/XtreamToolKit
 Ag*.lib
@@ -20,3 +22,4 @@ AsNetwork*.lib
 HanGame*.lib
 /Include/*.h
 *.ncb
+*.suo
