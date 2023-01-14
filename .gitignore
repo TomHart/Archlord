@@ -5,15 +5,15 @@
 /Projects/*/Release/
 /Projects/*/Debug Global/
 /Projects/*/Release Global/
+/Projects/*/Release_GM/
 /Tools/*/Debug/
 /Tools/*/Debug(Profile)/
 /Tools/*/Release/
 /Tools/*/Debug Global/
 /Tools/*/Release Global/
-Release/
-Debug/
-Release/*
-Debug/*
+/Tools/*/Release_GM/
+/Release/
+/Debug/
 *.vcxproj.user
 /Debug/XtreamToolKit
 Ag*.lib
