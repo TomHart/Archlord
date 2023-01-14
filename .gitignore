@@ -1,17 +1,22 @@
-/alef/.vs/
-/alef/Bin/
-/alef/Projects/*/Debug/
-/alef/Projects/*/Debug(Profile)/
-/alef/Projects/*/Release/
-/alef/Tools/*/Debug/
-/alef/Tools/*/Debug(Profile)/
-/alef/Tools/*/Release/
-/alef/Release/
-/alef/Debug/
+/.vs/
+/Bin/
+/Projects/*/Debug/
+/Projects/*/Debug(Profile)/
+/Projects/*/Release/
+/Projects/*/Debug Global/
+/Projects/*/Release Global/
+/Tools/*/Debug/
+/Tools/*/Debug(Profile)/
+/Tools/*/Release/
+/Tools/*/Debug Global/
+/Tools/*/Release Global/
+/Release/
+/Debug/
 *.vcxproj.user
-/alef/Debug/XtreamToolKit
+/Debug/XtreamToolKit
 Ag*.lib
 Ap*.lib
 AsNetwork*.lib
 HanGame*.lib
-/alef/Include/*.h
+/Include/*.h
+*.ncb
