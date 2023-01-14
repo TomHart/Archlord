@@ -1,0 +1,17 @@
+/alef/.vs/
+/alef/Bin/
+/alef/Projects/*/Debug/
+/alef/Projects/*/Debug(Profile)/
+/alef/Projects/*/Release/
+/alef/Tools/*/Debug/
+/alef/Tools/*/Debug(Profile)/
+/alef/Tools/*/Release/
+/alef/Release/
+/alef/Debug/
+*.vcxproj.user
+/alef/Debug/XtreamToolKit
+Ag*.lib
+Ap*.lib
+AsNetwork*.lib
+HanGame*.lib
+/alef/Include/*.h
