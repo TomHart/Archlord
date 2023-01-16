@@ -1283,7 +1283,7 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
-				Culture="1042"
+				Culture="2057"
 				AdditionalIncludeDirectories="&quot;$(IntDir)&quot;;&quot;$(SolutionDir)Include\XtreamToolKit&quot;"
 			/>
 			<Tool

@@ -184,7 +184,7 @@ BOOL AgsmNpcManager::LoadNpcManagerFile(char* fileName)
 		pNpcExData->pLuaPack = new CLuaStreamPack;
 		if(!pNpcExData->pLuaPack)
 		{
-			printf("error : %s[%d]\n", __FUNCDNAME__, __LINE__);
+			TRACE("error : %s[%d]\n", __FUNCDNAME__, __LINE__);
 
 			delete pNpcExData;
 			continue;
@@ -197,7 +197,7 @@ BOOL AgsmNpcManager::LoadNpcManagerFile(char* fileName)
 
 		if(!pNpcExData->pLuaPack->Open(szFileName, (nPlainText) ?  NULL : (Decrypt_CFunction)AgsmNpcManager::Decrypt))
 		{
-			printf("error : %s[%d]\n", __FUNCDNAME__, __LINE__);
+			TRACE("error : %s[%d]\n", __FUNCDNAME__, __LINE__);
 
 			delete pNpcExData->pLuaPack;
 			delete pNpcExData;
@@ -205,8 +205,6 @@ BOOL AgsmNpcManager::LoadNpcManagerFile(char* fileName)
 			continue;
 		}
 
-		
-		printf("Inserting NPCID: %d\n", pNpcExData->NPCID);
 		m_NpcExDataMap.insert(CNpcExDataMap::value_type(pNpcExData->NPCID, pNpcExData));
 	}
 
@@ -330,20 +328,14 @@ int AgsmNpcManager::LuaRegister(lua_State* pLuaState)
 
 BOOL AgsmNpcManager::ExecScriptMain(INT32 CID, INT32 NID, INT32 EID, INT32 STEP)
 {
-	printf("ExecScriptMain %d %d %d %d", CID, NID, EID, STEP);
 	AgpdCharacter* pcsCharacter = m_pagpmCharacter->GetCharacter(CID);
-	if(!pcsCharacter){
-		printf("Ret1");
+	if(!pcsCharacter)
 		return FALSE;
-	}
 
 	CNpcExDataMap::iterator it = m_NpcExDataMap.find(NID);
-	if(it == m_NpcExDataMap.end()){
-		printf("Ret2");
+	if(it == m_NpcExDataMap.end())
 		return FALSE;
-	}
 
-	printf("Executing");
 	ExecScriptMain(CID, it->second->NPCID, EID, STEP, it->second->pLuaPack);
 
 	return TRUE;

@@ -230,7 +230,7 @@ public:
 	AgcdUIUserData*		m_pstUDUseEAX;
 
 	BOOL				m_bViewNameMine, m_bViewNameMonster, m_bViewNameGuild, m_bViewNameParty, m_bViewNameOthers;
-	BOOL				m_bRefuseTrade, m_bRefusePartyIn, m_bRefuseGuildIn, m_bRefuseGuildBattle, m_bRefuseBattle;
+	BOOL				m_bRefuseTrade, m_bRefusePartyIn, m_bRefuseGuildIn, m_bRefuseGuildBattle, m_bRefuseBattle, m_bDisableXP;
 
 	BOOL				m_bRefuseGuildRelation;
 	BOOL				m_bRefuseBuddy;
@@ -250,7 +250,7 @@ public:
 	AgcdUIUserData		*m_pstUDViewHelpBaloonTip, *m_pstUDViewHelpBaloonChat, *m_pstUDViewHelpUclie;
 	BOOL				m_bViewSelfBars;
 	AgcdUIUserData		*m_pstUDViewSelfBars;
-	AgcdUIUserData		*m_pstUDRefuseTrade, *m_pstUDRefusePartyIn, *m_pstUDRefuseGuildIn, *m_pstUDRefuseGuildBattle, *m_pstUDRefuseBattle;
+	AgcdUIUserData		*m_pstUDRefuseTrade, *m_pstUDRefusePartyIn, *m_pstUDRefuseGuildIn, *m_pstUDRefuseGuildBattle, *m_pstUDRefuseBattle, *m_pstUDDisableXP;
 
 	BOOL				m_bDisableSkillEffect;
 	AgcdUIUserData*		m_pstUDDisableSkillEffect;
@@ -465,6 +465,7 @@ public:
 	static BOOL		CBViewSelfBars(PVOID pClass, PVOID pData1, PVOID pData2, PVOID pData3, PVOID pData4, PVOID pData5, ApBase *pcsTarget, AgcdUIControl *pcsSourceControl);
 
 	static BOOL		CBRefuseTrade(PVOID pClass, PVOID pData1, PVOID pData2, PVOID pData3, PVOID pData4, PVOID pData5, ApBase *pcsTarget, AgcdUIControl *pcsSourceControl);
+	static BOOL		CBDisableXP(PVOID pClass, PVOID pData1, PVOID pData2, PVOID pData3, PVOID pData4, PVOID pData5, ApBase *pcsTarget, AgcdUIControl *pcsSourceControl);
 	static BOOL		CBRefusePartyIn(PVOID pClass, PVOID pData1, PVOID pData2, PVOID pData3, PVOID pData4, PVOID pData5, ApBase *pcsTarget, AgcdUIControl *pcsSourceControl);
 	static BOOL		CBRefuseGuildIn(PVOID pClass, PVOID pData1, PVOID pData2, PVOID pData3, PVOID pData4, PVOID pData5, ApBase *pcsTarget, AgcdUIControl *pcsSourceControl);
 	static BOOL		CBRefuseGuildBattle(PVOID pClass, PVOID pData1, PVOID pData2, PVOID pData3, PVOID pData4, PVOID pData5, ApBase *pcsTarget, AgcdUIControl *pcsSourceControl);

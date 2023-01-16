@@ -12,7 +12,6 @@
 #include "AgsmCharacter.h"
 //#include "AgsmServerManager.h"
 #include "AgsmServerManager2.h"
-#include "AgsmSystemMessage.h"
 #include "AgsmAOIFilter.h"
 
 #include "AuPacket.h"
@@ -58,7 +57,6 @@ private:
 	AgsmServerManager	*m_pAgsmServerManager;
 	AgsmMap				*m_pcsAgsmMap;
 	AgsmAOIFilter		*m_pcsAgsmAOIFilter;
-	AgsmSystemMessage*  m_pagsmSystemMessage;
 
 	INT16				m_nIndexADCharacter;
 

@@ -1152,20 +1152,19 @@ BOOL AgsmDeath::AddBonusExpToChar(AgpdCharacter *pcsCharacter, AgpdCharacter *pc
 	//JK_특성화서버
 	INT32	lLimitLevel = m_pagpmConfig->GetLimitLevel();
 
-	AgsdCharacter* pcsAgsdCharacter = (AgsdCharacter*)m_pagsmCharacter->GetADCharacter(pcsCharacter);
+	BOOL disableXP = m_pagpmCharacter->IsOptionFlag(pcsCharacter, AGPDCHAR_OPTION_DISABLE_XP) == TRUE;
 
 	char strCharBuff[256] = { 0, };
 	sprintf_s(
 		strCharBuff,
 		sizeof(strCharBuff),
-		"[GivingExp3] To: %s, Exp: %s, AutoPickup: %s\n",
+		"[GivingExp3] To: %s, Exp: %s\n",
 		pcsCharacter->m_szID,
-		pcsAgsdCharacter->m_bDisableExp ? "Y" : "N",
-		pcsAgsdCharacter->m_bIsAutoPickupItem ? "Y" : "N"
+		!disableXP ? "Y" : "N"
 	);
 	AuLogFile_s("log/TomLog", strCharBuff);
 
-	if (pcsAgsdCharacter->m_bDisableExp) {
+	if (disableXP) {
 		return FALSE;
 	}
 

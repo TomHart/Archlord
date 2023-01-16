@@ -1396,13 +1396,6 @@ BOOL ServerEngine::OnRegisterModule()
 			printf("Fail Initialize GameGuard module\n");
 	}
 #endif
-
-	printf("ExpRatio  : %f\n",  g_pcsAgpmConfig->GetExpAdjustmentRatio());
-	printf("DropRatio : %f\n",  g_pcsAgpmConfig->GetDropAdjustmentRatio());
-	printf("Drop2Ratio: %f\n",  g_pcsAgpmConfig->GetDrop2AdjustmentRatio());
-	printf("GoldRatio : %f\n",  g_pcsAgpmConfig->GetGheldDropAdjustmentRatio());
-	printf("CharRatio : %f\n",  g_pcsAgpmConfig->GetCharismaDropAdjustmentRatio());
-
 	return TRUE;
 }
 

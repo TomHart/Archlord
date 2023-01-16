@@ -14,7 +14,10 @@
 /Tools/*/Release_GM/
 /Release/
 /Debug/
+Release Global
+Release Japanese DLL
 *.vcxproj.user
+*.vcproj.TOM-PC.tomha.user
 /Debug/XtreamToolKit
 Ag*.lib
 Ap*.lib

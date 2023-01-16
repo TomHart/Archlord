@@ -30,7 +30,6 @@ BOOL AgsmZoning::OnAddModule()
 	m_pAgsmServerManager	= (AgsmServerManager *)	GetModule("AgsmServerManager2");
 	m_pcsAgsmMap			= (AgsmMap *)			GetModule("AgsmMap");
 	m_pcsAgsmAOIFilter		= (AgsmAOIFilter *)		GetModule("AgsmAOIFilter");
-	m_pagsmSystemMessage    = (AgsmSystemMessage*)GetModule("AgsmSystemMessage");
 
 	if (!m_pcsApmMap ||
 		!m_pcsAgpmFactors ||
@@ -893,12 +892,6 @@ BOOL AgsmZoning::AllServerAdd(AgpdCharacter *pcsCharacter)
 	//m_pcsAgsmAOIFilter->SendPacketGroup(pvPacket, nPacketLength, m_pAgsmServerManager->GetGameServersDPNID(), PACKET_PRIORITY_1);
 
 	m_csPacket.FreePacket(pvPacket);
-
-	if(m_pagsmSystemMessage){
-		m_pagsmSystemMessage->SendSystemGeneralString(pcsCharacter, "You logged in!");
-	} else {
-		printf("No SystemMessage");
-	}
 
 	return TRUE;
 }

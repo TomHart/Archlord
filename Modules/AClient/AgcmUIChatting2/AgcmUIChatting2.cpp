@@ -1860,6 +1860,29 @@ BOOL AgcmUIChatting2::CBUpdateOptionFlag( PVOID pData, PVOID pClass, PVOID pCust
 			pThis->m_pcsAgcmChatting2->EnumCallback(AGCMCHATTING2_CB_INPUT_MESSAGE, NULL, NULL);
 		}
 	}
+
+	if (pcsAgpmCharacter->IsOptionFlag(lOptionFlag ,AGPDCHAR_OPTION_DISABLE_XP) 
+		!= pcsAgpmCharacter->IsOptionFlag(pcsCharacter, AGPDCHAR_OPTION_DISABLE_XP))
+	{
+		CHAR *szMessage = NULL;
+		CHAR *szColor = pThis->m_pcsAgcmUIManager2->GetUIMessage(UI_MESSAGE_ID_CHAT_OPTION_ON_COLOR);
+		DWORD dwColor = 0x00FF0000;
+
+		if(pcsAgpmCharacter->IsOptionFlag(lOptionFlag ,AGPDCHAR_OPTION_DISABLE_XP))
+		{
+			szMessage = pThis->m_pcsAgcmUIManager2->GetUIMessage(UI_MESSAGE_ID_CHAT_OPTION_EXP_OFF);
+			szColor = pThis->m_pcsAgcmUIManager2->GetUIMessage(UI_MESSAGE_ID_CHAT_OPTION_OFF_COLOR);
+		}
+		else szMessage = pThis->m_pcsAgcmUIManager2->GetUIMessage(UI_MESSAGE_ID_CHAT_OPTION_EXP_ON);
+		if (szMessage)
+		{
+			if(szColor) dwColor = atol(szColor);
+
+			pThis->m_pcsAgcmChatting2->AddSystemMessage(szMessage, dwColor);
+			pThis->m_pcsAgcmChatting2->EnumCallback(AGCMCHATTING2_CB_INPUT_MESSAGE, NULL, NULL);
+		}
+	}
+
 	if (pcsAgpmCharacter->IsOptionFlag(lOptionFlag ,AGPDCHAR_OPTION_REFUSE_PARTY_IN) 
 		!= pcsAgpmCharacter->IsOptionFlag(pcsCharacter, AGPDCHAR_OPTION_REFUSE_PARTY_IN))
 	{

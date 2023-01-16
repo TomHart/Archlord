@@ -107,6 +107,7 @@ AgcmUIOption::AgcmUIOption()
 	m_bRefuseGuildIn = FALSE;
 	m_bRefuseGuildBattle = FALSE;
 	m_bRefuseBattle = FALSE;
+	m_bDisableXP = FALSE;
 
 	m_bRefuseGuildRelation = FALSE;
 	m_bRefuseBuddy = FALSE;
@@ -468,6 +469,10 @@ BOOL AgcmUIOption::OnAddModule()
 	m_pstUDRefuseTrade = m_pcsAgcmUIManager2->AddUserData("OP_RefuseTrade", &m_bRefuseTrade, sizeof(BOOL), 1, AGCDUI_USERDATA_TYPE_BOOL);
 	if (m_pstUDRefuseTrade < 0)		return FALSE;
 	if (!m_pcsAgcmUIManager2->AddFunction(this, "OP_RefuseTrade", CBRefuseTrade, 0))		return FALSE;
+	
+	m_pstUDDisableXP = m_pcsAgcmUIManager2->AddUserData("OP_DisableXP", &m_bDisableXP, sizeof(BOOL), 1, AGCDUI_USERDATA_TYPE_BOOL);
+	if (m_pstUDDisableXP < 0)		return FALSE;
+	if (!m_pcsAgcmUIManager2->AddFunction(this, "OP_DisableXP", CBDisableXP, 0))		return FALSE;
 
 	m_pstUDRefusePartyIn = m_pcsAgcmUIManager2->AddUserData("OP_RefusePartyIn", &m_bRefusePartyIn, sizeof(BOOL), 1, AGCDUI_USERDATA_TYPE_BOOL);
 	if (m_pstUDRefusePartyIn < 0)		return FALSE;
@@ -3312,6 +3317,10 @@ BOOL	AgcmUIOption::LoadFromINI(char*	szFile)
 				{
 					csStream.GetValue(&m_bRefuseTrade);
 				}
+				else if(!strcmp(szValueName, "REF_DXP"))
+				{
+					csStream.GetValue(&m_bDisableXP);
+				}
 				else if(!strcmp(szValueName, "REF_PIN"))
 				{
 					csStream.GetValue(&m_bRefusePartyIn);
@@ -3474,6 +3483,7 @@ BOOL	AgcmUIOption::SaveToINI(char*		szFileName)
 	if(!csStream.SetSection("Option_Option"))		return FALSE;
 
 	if(!csStream.WriteValue("REF_TRADE", m_bRefuseTrade))		return FALSE;
+	if(!csStream.WriteValue("REF_DXP", m_bDisableXP))			return FALSE;
 	if(!csStream.WriteValue("REF_PIN", m_bRefusePartyIn))		return FALSE;
 	if(!csStream.WriteValue("REF_GIN", m_bRefuseGuildIn))		return FALSE;
 	if(!csStream.WriteValue("REF_GBAT", m_bRefuseGuildBattle))	return FALSE;
@@ -3503,6 +3513,23 @@ BOOL AgcmUIOption::CBRefuseTrade(PVOID pClass, PVOID pData1, PVOID pData2, PVOID
 		BOOL bClick = (((AcUIButton *) pcsSourceControl->m_pcsBase)->GetButtonMode() == ACUIBUTTON_MODE_CLICK);
 		pThis->SendOptionFlag(AGPDCHAR_OPTION_REFUSE_TRADE, bClick);
 		pThis->m_pcsAgcmUIManager2->SetUserDataRefresh(pThis->m_pstUDRefuseTrade);
+	}
+	return FALSE;
+}
+
+
+BOOL AgcmUIOption::CBDisableXP(PVOID pClass, PVOID pData1, PVOID pData2, PVOID pData3, PVOID pData4, PVOID pData5, ApBase *pcsTarget, AgcdUIControl *pcsSourceControl)
+{
+	AgcmUIOption *	pThis = (AgcmUIOption *) pClass;
+
+	AgpdCharacter *pcsSelfCharacter = pThis->m_pcsAgcmCharacter->GetSelfCharacter();
+	if (!pcsSelfCharacter) return FALSE;
+
+	if (pcsSourceControl && pcsSourceControl->m_lType == AcUIBase::TYPE_BUTTON)
+	{
+		BOOL bClick = (((AcUIButton *) pcsSourceControl->m_pcsBase)->GetButtonMode() == ACUIBUTTON_MODE_CLICK);
+		pThis->SendOptionFlag(AGPDCHAR_OPTION_DISABLE_XP, bClick);
+		pThis->m_pcsAgcmUIManager2->SetUserDataRefresh(pThis->m_pstUDDisableXP);
 	}
 	return FALSE;
 }
@@ -3721,6 +3748,7 @@ BOOL AgcmUIOption::CBSettingCharacterOK( PVOID pData, PVOID pClass, PVOID pCustD
 	pThis->m_bRefuseBattle		= FALSE;
 	pThis->m_bRefuseGuildRelation	= FALSE;
 	pThis->m_bRefuseBuddy		= FALSE;
+	pThis->m_bDisableXP		= FALSE;
 
 	pThis->RefreshRefuseControl();
 
@@ -3759,6 +3787,7 @@ VOID AgcmUIOption::RefreshRefuseControl(INT32 lOptionFlag)
 	m_bRefuseGuildIn		= m_pcsAgpmCharacter->IsOptionFlag( lOptionFlag, AGPDCHAR_OPTION_REFUSE_GUILD_IN );
 	m_bRefuseGuildRelation	= m_pcsAgpmCharacter->IsOptionFlag( lOptionFlag, AGPDCHAR_OPTION_REFUSE_GUILD_RELATION );
 	m_bRefuseBuddy			= m_pcsAgpmCharacter->IsOptionFlag( lOptionFlag, AGPDCHAR_OPTION_REFUSE_BUDDY );
+	m_bDisableXP			= m_pcsAgpmCharacter->IsOptionFlag( lOptionFlag, AGPDCHAR_OPTION_DISABLE_XP );
 
 	RefreshRefuseControl();
 }
@@ -3766,6 +3795,7 @@ VOID AgcmUIOption::RefreshRefuseControl(INT32 lOptionFlag)
 VOID AgcmUIOption::RefreshRefuseControl()
 {
 	m_pcsAgcmUIManager2->SetUserDataRefresh(m_pstUDRefuseTrade);
+	m_pcsAgcmUIManager2->SetUserDataRefresh(m_pstUDDisableXP);
 	m_pcsAgcmUIManager2->SetUserDataRefresh(m_pstUDRefusePartyIn);
 	m_pcsAgcmUIManager2->SetUserDataRefresh(m_pstUDRefuseGuildBattle);
 	m_pcsAgcmUIManager2->SetUserDataRefresh(m_pstUDRefuseBattle);
@@ -3789,6 +3819,7 @@ VOID AgcmUIOption::SendOptionFlag()
 	if (m_bRefuseGuildIn)		lOptionFlag = m_pcsAgpmCharacter->SetOptionFlag(lOptionFlag, AGPDCHAR_OPTION_REFUSE_GUILD_IN);
 	if (m_bRefuseGuildRelation)	lOptionFlag = m_pcsAgpmCharacter->SetOptionFlag(lOptionFlag, AGPDCHAR_OPTION_REFUSE_GUILD_RELATION);
 	if (m_bRefuseBuddy)			lOptionFlag = m_pcsAgpmCharacter->SetOptionFlag(lOptionFlag, AGPDCHAR_OPTION_REFUSE_BUDDY);
+	if (m_bDisableXP)			lOptionFlag = m_pcsAgpmCharacter->SetOptionFlag(lOptionFlag, AGPDCHAR_OPTION_DISABLE_XP);
 
 	m_pcsAgcmCharacter->SendPacketOptionFlag(pcsSelfCharacter, lOptionFlag);
 }
