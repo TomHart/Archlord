@@ -709,27 +709,31 @@ BOOL AgcmUICashMall::CBBuyProductConfirm(PVOID pClass, PVOID pData1, PVOID pData
 	}
 
 	pThis->m_pcsBuyItem	= pThis->m_pcsAgpmItem->GetItem(pThis->m_pcsAgpmGrid->GetItem(&pThis->m_acsItemGrid[pcsSourceControl->m_lUserDataIndex], 0, 0, 0));
-
-#ifdef _AREA_GLOBAL_
-	INT32 iRetValue = pThis->m_pcsAgcmUIManager2->ActionMessageThreeBtnDialog(	pThis->m_pcsAgcmUIManager2->GetUIMessage(AGCMUIMESSAGE_CASHMALL_SELECT_BUY_METHOD),
-																				pThis->m_pcsAgcmUIManager2->GetUIMessage("CCash"),
-																				pThis->m_pcsAgcmUIManager2->GetUIMessage("PCash"),
-																				//ClientStr().GetStr(STI_CASHMALLUI_WCOIN_C), //"W Coin(c)"
-																				//ClientStr().GetStr(STI_CASHMALLUI_WCOIN_P), //"W Coin(p)"
-																				ClientStr().GetStr(STI_CANCEL)); //"Cancel"
-
-	if( 0 == iRetValue )
-		pThis->m_iCashType = AGPMCASHMALL_TYPE_WCOIN;
-	else if( 1 == iRetValue )
-		pThis->m_iCashType = AGPMCASHMALL_TYPE_WCOIN_PPCARD;
-	else if( -1 == iRetValue )
-		return FALSE;
-#endif
+	
+	pThis->m_iCashType = AGPMCASHMALL_TYPE_WCOIN;
+//#ifdef _AREA_GLOBAL_
+//	INT32 iRetValue = pThis->m_pcsAgcmUIManager2->ActionMessageThreeBtnDialog(	pThis->m_pcsAgcmUIManager2->GetUIMessage(AGCMUIMESSAGE_CASHMALL_SELECT_BUY_METHOD),
+//																				pThis->m_pcsAgcmUIManager2->GetUIMessage("CCash"),
+//																				pThis->m_pcsAgcmUIManager2->GetUIMessage("PCash"),
+//																				//ClientStr().GetStr(STI_CASHMALLUI_WCOIN_C), //"W Coin(c)"
+//																				//ClientStr().GetStr(STI_CASHMALLUI_WCOIN_P), //"W Coin(p)"
+//																				ClientStr().GetStr(STI_CANCEL)); //"Cancel"
+//
+//	if( 0 == iRetValue )
+//		pThis->m_iCashType = AGPMCASHMALL_TYPE_WCOIN;
+//	else if( 1 == iRetValue )
+//		pThis->m_iCashType = AGPMCASHMALL_TYPE_WCOIN_PPCARD;
+//	else if( -1 == iRetValue )
+//		return FALSE;
+//#endif
 
 	pThis->m_pcsAgcmUIManager2->RefreshUserData(pThis->m_pcsUserDataBuyProduct, TRUE);
 
-	if (pThis->m_pcsBuyItem)
-		pThis->m_pcsAgcmUIManager2->ThrowEvent(pThis->m_lEventBuyProductConfirm);
+	if (pThis->m_pcsBuyItem){
+		//pThis->m_pcsAgcmUIManager2->ThrowEvent(pThis->m_lEventBuyProductConfirm);
+
+		pThis->m_pcsAgcmUIManager2->GetFunction("CashMallBuyProduct")->m_fnCallback( pClass, pData1, pData2, pData3, pData4, pData5, pcsTarget, pcsSourceControl);
+	}
 
 	return TRUE;
 }
@@ -744,14 +748,14 @@ BOOL AgcmUICashMall::CBBuyProduct(PVOID pClass, PVOID pData1, PVOID pData2, PVOI
 	if (!pThis->m_pcsBuyItem)
 		return FALSE;
 
-	// 죽은 상태에서는 아이템을 구입할 수 없다.
+	// (Guessing) Can't buy if dead
 	if (pThis->m_pcsAgcmCharacter->GetSelfCharacter()->m_unActionStatus == AGPDCHAR_STATUS_DEAD)
 	{
 		pThis->m_pcsAgcmUIManager2->ActionMessageOKDialog(pThis->m_pcsAgcmUIManager2->GetUIMessage(AGCMUIMESSAGE_CASHMALL_NOT_COMMIT_ON_DEAD));
 		return FALSE;
 	}
 
-	// 캐쉬 아이템 구입 개수 제한.
+	// Too many things to buy
 	if (AgpdCharacter* pcsCharacter = pThis->m_pcsAgcmCharacter->GetSelfCharacter())
 	{
 		if (AgpdGrid* pCashInven = pThis->m_pcsAgpmItem->GetCashInventoryGrid( pcsCharacter ))

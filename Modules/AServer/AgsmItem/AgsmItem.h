@@ -94,7 +94,7 @@ typedef enum _eAgsmItemCB {
 const int	AGSMITEM_AD_ITEM							= 1;
 const int	AGSMITEM_REDUCE_DURABILITY					= 1;
 const int	AGSMITEM_PROCESS_REMOVE_FIELD_ITEM_INTERVAL	= 10000;
-const int	AGSMITEM_MAX_PRESERVE_ITEM_FIELD_TIME		= 30000;	// 일단 30초 한다.
+const int	AGSMITEM_MAX_PRESERVE_ITEM_FIELD_TIME		= 90000;	// 일단 30초 한다.
 
 class AgpmGuild;
 class AgsmTitle;

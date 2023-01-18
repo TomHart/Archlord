@@ -880,7 +880,7 @@ BOOL AgpmDropItem2::ProcessDropItem(AgpdCharacter *pcsDropCharacter, INT32 lAtta
 	csDropInfo.m_lAttackerLevel		= lAttackerLevel;
 	csDropInfo.m_pcsFirstLooter		= pcsFirstLooter;
 
-	// 이벤트 몬스터라면 이벤트 아이템을 떨군다.
+	// Something to do with an event?
 	if (pcsDropCharacter->m_ulSpecialStatus & AGPDCHAR_SPECIAL_STATUS_EVENT_GIFTBOX &&
 		CalcLevelGap(lMobLevel, lAttackerLevel) > 0)
 	{
@@ -901,8 +901,8 @@ BOOL AgpmDropItem2::ProcessDropItem(AgpdCharacter *pcsDropCharacter, INT32 lAtta
 		}
 	}
 
-	// 하드코딩... ㅡㅡ;;;
-	// TID가 197인 몬스터가 오면 아이템을 무조건 드랍
+	// 4608 = Archon Scroll, for the AL battle I think?
+	// 197 = Necromantic Ruler
 	if (197 == pcsDropCharacter->m_pcsCharacterTemplate->m_lID)
 	{
 		EnumCallback(AGPM_DROPITEM_CB_DROP_ITEM, m_pcsAgpmItem->GetItemTemplate(4608), &csDropInfo);
@@ -975,6 +975,7 @@ BOOL AgpmDropItem2::ProcessDropItem(AgpdCharacter *pcsDropCharacter, INT32 lAtta
 			lDropRateTotal	= 0;
 			for (iter = pcsDropGroup->m_vtTemplates.begin(); iter != pcsDropGroup->m_vtTemplates.end(); ++iter)
 			{
+				// Looks like code to not drop pardons for non skulled players
 				if (((*iter).m_pcsItemTemplate)->m_bIsVillainOnly &&
 					pcsFirstLooter)
 					if (pcsFirstLooter->m_eType == APBASE_TYPE_CHARACTER && !m_pcsAgpmCharacter->IsMurderer((AgpdCharacter *) pcsFirstLooter) ||
@@ -1200,6 +1201,7 @@ BOOL AgpmDropItem2::GetDropItemList(AgpdDropItems *pvtDropList, AgpdDropItems *p
 	INT32					lDropRate			= 0;
 	INT32					lRemainItem			= lItemNum;
 	AgpdDropItemADItemTemplate *	pcsADItemTemplate;
+
 
 	vector<INT32> plRandomValue;
 	plRandomValue.reserve(lItemNum);

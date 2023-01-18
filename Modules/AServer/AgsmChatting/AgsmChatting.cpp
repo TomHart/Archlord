@@ -630,13 +630,24 @@ BOOL AgsmChatting::ParseCommand(AgpdChatData * pstChatData)
 				char buffer[arraySize];
 				sprintf(
 					buffer, 
-					"ExpRatio  : %.1f\nDropRatio : %.1f\nDrop2Ratio: %.1f\nGoldRatio : %.1f\nCharRatio : %.1f", 
+					"ExpRatio   : %d\nDropRatio  : %d\nDrop2Ratio : %d", 
+					m_pagpmConfig->GetExpAdjustmentRatio(),
+					m_pagpmConfig->GetDropAdjustmentRatio(),
+					m_pagpmConfig->GetDrop2AdjustmentRatio()
+				);
+				printf(buffer);
+				m_pagsmSystemMessage->SendSystemGeneralString(pcsAgpdCharacter, buffer);
+
+				sprintf(
+					buffer, 
+					"GoldRatio  : %d\nCharRatio  : %d", 
 					m_pagpmConfig->GetExpAdjustmentRatio(),
 					m_pagpmConfig->GetDropAdjustmentRatio(),
 					m_pagpmConfig->GetDrop2AdjustmentRatio(),
 					m_pagpmConfig->GetGheldDropAdjustmentRatio(),
 					m_pagpmConfig->GetCharismaDropAdjustmentRatio()
 				);
+				printf(buffer);
 				m_pagsmSystemMessage->SendSystemGeneralString(pcsAgpdCharacter, buffer);
 			}
 
