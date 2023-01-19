@@ -663,7 +663,8 @@ BOOL AgsmBilling::SendGetCashMoneyGlobal(AgpdCharacter *pAgpdCharacter)
 		return FALSE;
 	}
 
-	m_pagpmBillInfo->GiveGlobalCash(pAgpdCharacter, 999999, 999999);
+	printf("Giving global cash\n");
+	m_pagpmBillInfo->GiveGlobalCash(pAgpdCharacter, 100000, 0);
 
 #endif
 

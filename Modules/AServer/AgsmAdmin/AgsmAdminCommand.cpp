@@ -1457,7 +1457,23 @@ BOOL AgsmAdmin::ParseCommand(AgpdChatData * pstChatData, BOOL bCheckAdmin)
 
 		WriteLog_Gheld(AGPDLOGTYPE_GHELD_GMEDIT, pcsAgpdCharacter, pcsAgpdCharacter);
 
-		return m_pagpmCharacter->AddMoney(pcsAgpdCharacter, 100000);
+		return m_pagpmCharacter->AddMoney(pcsAgpdCharacter, 10000000);
+	}
+	else if (strncmp(pstChatData->szMessage + i, "/maxdrop", k - i) == 0) {
+		
+		if(!pcsAgpdCharacter
+			|| (!m_pagpmAdmin->IsAdminCharacter(pcsAgpdCharacter) || m_pagpmAdmin->GetAdminLevel(pcsAgpdCharacter) < AGPMADMIN_LEVEL_3)
+			&& !CheckAdminTypeSpecial(pcsAgpdCharacter, pstChatData->szMessage + i, k-1))
+			return FALSE;
+
+		m_pagpmCharacter->UpdateSpecialStatus(pcsAgpdCharacter, AGPDCHAR_SPECIAL_STATUS_DROP_RATE_100);
+
+		if(m_pagsmSystemMessage){
+			m_pagsmSystemMessage->SendSystemGeneralString(
+				pcsAgpdCharacter, 
+				pcsAgpdCharacter->m_ulSpecialStatus & AGPDCHAR_SPECIAL_STATUS_DROP_RATE_100 ? "Max Drop Y" : "Max Drop N"
+			);
+		}
 	}
 	else if (strncmp(pstChatData->szMessage + i, ServerStr().GetStr(STI_CHAT_CHARPOINT_FULL), k - i) == 0)
 	{

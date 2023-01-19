@@ -1714,16 +1714,22 @@ BOOL ServerEngine::Shutdown()
 	printf("\n Success !!!! \n");
 
 	SetServerStatus(GF_SERVER_STOP);
+	printf("Server status set\n");
 
 	DisconnectServers();
+	printf("Servers disconnected\n");
 
 	StopProcess();
+	printf("Process stopped\n");
 
 	RemoveUsers();
+	printf("Users removed\n");
 
 	OnTerminate();
+	printf("Terminated\n");
 
 	Stop();
+	printf("Stopped\n");
 
 	return TRUE;
 }
