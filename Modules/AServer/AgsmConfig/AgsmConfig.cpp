@@ -373,7 +373,7 @@ BOOL AgsmConfig::LoadConfig()
 	{
 		m_pcsAgpmConfig->SetLimitLevel(atoi(szTmpValue));
 	}
-	//JK_특성화서버
+
 	szTmpValue = pagsdServer->GetExtraValue(AGSMSERVER_EXTRA_KEY_DROP2_ADJUST_RATIO);
 	if (NULL != szTmpValue)
 	{
@@ -382,6 +382,16 @@ BOOL AgsmConfig::LoadConfig()
 	else
 	{
 		m_pcsAgpmConfig->SetDrop2AdjustmentRatio();
+	}
+
+	szTmpValue = pagsdServer->GetExtraValue(AGSMSERVER_EXTRA_KEY_CHAR_ADJUST_RATIO);
+	if (NULL != szTmpValue)
+	{
+		m_pcsAgpmConfig->SetCharismaDropAdjustmentRatio((FLOAT)atof(szTmpValue));
+	}
+	else
+	{
+		m_pcsAgpmConfig->SetCharismaDropAdjustmentRatio();
 	}
 
 

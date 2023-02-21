@@ -508,15 +508,17 @@ BOOL AgsmCharacter::CBUpdateCash(PVOID pData, PVOID pClass, PVOID pCustData)
 	bResult = FALSE;
 
 //	if (!pData || !pClass || !pCustData)
-	if (!pData || !pClass)
+	if (!pData || !pClass){
 		return bResult;
+	}
 
 	AgsmCharacter*	pThis = (AgsmCharacter *) pClass;
 	AgpdCharacter*	pcsAgpdCharacter = (AgpdCharacter *) pData;
 	AgsdCharacter*	pcsAgsdCharacter = pThis->GetADCharacter(pcsAgpdCharacter);
 
-	if (pcsAgsdCharacter->m_dpnidCharacter == 0)
+	if (pcsAgsdCharacter->m_dpnidCharacter == 0){
 		return TRUE;
+	}
 
 	INT8	cOperation = AGPMCHAR_PACKET_OPERATION_UPDATE;
 	INT16	nPacketLength;

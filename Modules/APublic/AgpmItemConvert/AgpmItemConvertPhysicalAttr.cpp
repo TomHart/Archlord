@@ -92,6 +92,20 @@ AgpdItemConvertResult AgpmItemConvert::PhysicalConvert(AgpdItem *pcsItem, AgpdIt
 
 	EnumCallback(AGPDITEMCONVERT_CB_ADJUST_SUCCESS_PROB, pvBuffer, &fSuccessProb);
 
+	// Did a reset Success rate: 1.000000, randomNumber: 86, successRate: 32, failProb: 83, resetProb: 93
+	const size_t arraySize = 250;
+	char buffer[arraySize];
+	sprintf(
+		buffer, 
+		"Success rate: %f, randomNumber: %d, successRate: %d, failProb: %d, resetProb: %d\n", 
+		fSuccessProb,
+		lRandomNumber,
+		(INT32) (m_astTablePhysical[lItemRank].lSuccessProb[lConvertLevel] * fSuccessProb),
+		(INT32) (m_astTablePhysical[lItemRank].lSuccessProb[lConvertLevel] * fSuccessProb) + m_astTablePhysical[lItemRank].lFailProb[lConvertLevel],
+		(INT32) (m_astTablePhysical[lItemRank].lSuccessProb[lConvertLevel] * fSuccessProb) + m_astTablePhysical[lItemRank].lFailProb[lConvertLevel] + m_astTablePhysical[lItemRank].lInitProb[lConvertLevel]
+	);
+	printf(buffer);
+
 	if (lRandomNumber < (INT32) (m_astTablePhysical[lItemRank].lSuccessProb[lConvertLevel] * fSuccessProb))
 		return AGPDITEMCONVERT_RESULT_SUCCESS;
 	else if (lRandomNumber < (INT32) (m_astTablePhysical[lItemRank].lSuccessProb[lConvertLevel] * fSuccessProb) +
@@ -102,7 +116,7 @@ AgpdItemConvertResult AgpmItemConvert::PhysicalConvert(AgpdItem *pcsItem, AgpdIt
 							 m_astTablePhysical[lItemRank].lInitProb[lConvertLevel])
 		return AGPDITEMCONVERT_RESULT_FAILED_AND_INIT_SAME;
 	else
-		return AGPDITEMCONVERT_RESULT_FAILED_AND_DESTROY;
+		return AGPDITEMCONVERT_RESULT_FAILED;
 
 	return AGPDITEMCONVERT_RESULT_FAILED;
 }

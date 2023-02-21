@@ -180,12 +180,18 @@ BOOL AgpmBillInfo::IsPCBang(AgpdCharacter *pcsCharacter)
 
 BOOL AgpmBillInfo::SetCashGlobal(AgpdCharacter* pcsCharacter, double WCoin, double PCoin)
 {
-	if (!pcsCharacter)
+	if (!pcsCharacter){
+		printf("SetCashGlobal 1");
 		return FALSE;
+	}
 
 	AgpdBillInfo	*pcsAttachData	= GetADCharacter(pcsCharacter);
-	if(!pcsAttachData)
+	if(!pcsAttachData){
+		printf("SetCashGlobal 2");
 		return FALSE;
+	}
+
+	printf("Setting w coin to %0.1f\n", WCoin, WCoin);
 
 	pcsAttachData->m_CashInfoGlobal.m_WCoin = WCoin;
 	pcsAttachData->m_CashInfoGlobal.m_PCoin = PCoin;
@@ -205,17 +211,23 @@ BOOL AgpmBillInfo::GetCashGlobal(AgpdCharacter* pcsCharacter, double& WCoin, dou
 	WCoin = pcsAttachData->m_CashInfoGlobal.m_WCoin;
 	PCoin = pcsAttachData->m_CashInfoGlobal.m_PCoin;
 
+	printf("Got cash global, %f\n", WCoin);
+
 	return TRUE;
 }
 
 BOOL AgpmBillInfo::GiveGlobalCash(AgpdCharacter* pcsCharacter, double WCoin, double PCoin)
 {
-	if (!pcsCharacter)
+	if (!pcsCharacter){
+		printf("GiveGlobalCash 1");
 		return FALSE;
+	}
 
 	AgpdBillInfo	*pcsAttachData	= GetADCharacter(pcsCharacter);
-	if(!pcsAttachData)
+	if(!pcsAttachData){
+		printf("GiveGlobalCash 2");
 		return FALSE;
+	}
 
 	pcsAttachData->m_CashInfoGlobal.m_WCoin = WCoin;
 	pcsAttachData->m_CashInfoGlobal.m_PCoin = PCoin;

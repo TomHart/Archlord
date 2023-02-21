@@ -147,6 +147,7 @@ BOOL AgsmCashMall::CBRequestBuyItem(PVOID pData, PVOID pClass, PVOID pCustData)
 
 BOOL AgsmCashMall::CBRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData)
 {
+	printf("Refreshing cash...\n");
 	if (!pData || !pClass)
 		return FALSE;
 
@@ -154,15 +155,29 @@ BOOL AgsmCashMall::CBRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData)
 	AgpdCharacter	*pcsCharacter	= (AgpdCharacter *)	pData;
 
 	AgpdCashMall	*pcsAttachData	= pThis->m_pcsAgpmCashMall->GetADCharacter(pcsCharacter);
-	if (!pcsAttachData)
+	if (!pcsAttachData){
+		printf("1");
 		return FALSE;
+	}
 
-	if (pcsAttachData->m_ulLastRefreshCashTimeMsec + AGPMCASHMALL_MIN_INTERVAL_REFRESH_CASH > pThis->GetClockCount())
+	if (pcsAttachData->m_ulLastRefreshCashTimeMsec + AGPMCASHMALL_MIN_INTERVAL_REFRESH_CASH > pThis->GetClockCount()){
+		printf("2");
 		return TRUE;
+	}
 
 	pcsAttachData->m_ulLastRefreshCashTimeMsec	= pThis->GetClockCount() + AGPMCASHMALL_MIN_INTERVAL_REFRESH_CASH;
 
 	// request to billing server
+	
+	CashInfoGlobal pCash;
+	pThis->m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
+	printf("Increasing from %f to %f\n", pCash.m_WCoin, 2500.0);
+	pThis->m_pcsAgpmBillInfo->SetCashGlobal(pcsCharacter, 2500.0, 0);
+
+	pThis->m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
+	printf("Now %f\n", pCash.m_WCoin);
+
+
 	return TRUE;
 }
 

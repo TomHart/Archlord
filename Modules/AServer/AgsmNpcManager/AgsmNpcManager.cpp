@@ -190,12 +190,12 @@ BOOL AgsmNpcManager::LoadNpcManagerFile(char* fileName)
 			continue;
 		}
 
-		CHAR szFileName[MAX_PATH] = { 0, };
+		char szFileName[256] = { 0, };
 		sprintf_s(szFileName, sizeof(szFileName), "ini\\NPCManager\\%s", pNpcExData->strFileName);
-		INT32 nPlainText;
+		int nPlainText = 0;
 		pElemFile->Attribute("PlainText", &nPlainText);
 
-		if(!pNpcExData->pLuaPack->Open(szFileName, (nPlainText) ?  NULL : (Decrypt_CFunction)AgsmNpcManager::Decrypt))
+		if(!pNpcExData->pLuaPack->Open(szFileName, NULL))
 		{
 			TRACE("error : %s[%d]\n", __FUNCDNAME__, __LINE__);
 
@@ -343,8 +343,8 @@ BOOL AgsmNpcManager::ExecScriptMain(INT32 CID, INT32 NID, INT32 EID, INT32 STEP)
 
 INT32 AgsmNpcManager::ExecScriptMain(INT32 CID, INT32 NID, INT32 lEvnetIndex, INT32 lStep, CLuaStreamPack* pLuaPack)
 {
-	if( /*CID == 0 || lEvnetIndex == 0 ||*/ !pLuaPack )
-		return 0;
+	//if( /*CID == 0 || lEvnetIndex == 0 ||*/ !pLuaPack )
+	//	return 0;
 
 	lua_State* pLuaState = m_LuaList.GetHandle();
 	if(!pLuaState)

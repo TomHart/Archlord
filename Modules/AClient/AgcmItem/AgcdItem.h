@@ -22,7 +22,7 @@
 #define	AGCDITEM_TEXTURE_NAME_LENGTH			64
 
 #define	AGCDITEM_MAX_AUTO_LOOTING_RANGE			900				// 자동으로 아템을 집어들때 최대 거리
-#define	AGCDITEM_AUTO_LOOTING_INTERVAL_TIME		300				// 자동으로 아템 집어들 인터벌 (MSec)
+#define	AGCDITEM_AUTO_LOOTING_INTERVAL_TIME		30				// 자동으로 아템 집어들 인터벌 (MSec)
 
 typedef struct	AgcdItem					AgcdItem;
 typedef struct	AgcdItemTemplateEquipSet	AgcdItemTemplateEquipSet;

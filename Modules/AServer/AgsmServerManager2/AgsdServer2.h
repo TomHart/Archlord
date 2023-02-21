@@ -57,7 +57,8 @@
 #define AGSMSERVER_EXTRA_KEY_AIM_EVENT_SERVER			_T("AimEventServer")	// 이벤트 목적의 서버
 #define AGSMSERVER_EXTRA_KEY_EVENT_CHATTING				_T("EventChatting")		// 이벤트 채팅 설정 
 #define AGSMSERVER_EXTRA_KEY_LIMIT_LEVEL				_T("LimitLevel")		// 최대레벨제한 JK_특성화서버
-#define AGSMSERVER_EXTRA_KEY_DROP2_ADJUST_RATIO			_T("Drop2AdjRatio")		// 희귀아이템 드랍률 //JK_특성화서버
+#define AGSMSERVER_EXTRA_KEY_DROP2_ADJUST_RATIO			_T("Drop2AdjRatio")		
+#define AGSMSERVER_EXTRA_KEY_CHAR_ADJUST_RATIO			_T("CharAdjRatio")		
 	
 typedef enum _eAGSMSERVER_TYPE
 	{

@@ -674,6 +674,8 @@ BOOL AgsmRelay2::OnParamCoupon(PACKET_HEADER* pvPacket, UINT32 ulNID)
 
 		} break;
 	}
+
+	return TRUE;
 }
 
 

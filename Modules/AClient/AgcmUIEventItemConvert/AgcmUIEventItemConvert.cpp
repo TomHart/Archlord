@@ -807,7 +807,7 @@ BOOL AgcmUIEventItemConvert::CBConvertOK(PVOID pClass, PVOID pData1, PVOID pData
 			if (bResult)
 			{
 				pThis->m_bIsRequestConvert	= TRUE;
-				pThis->m_ulNextRequestConvertTime	= pThis->GetClockCount() + 3000;
+				pThis->m_ulNextRequestConvertTime	= pThis->GetClockCount() + 500;
 			}
 
 			return bResult;

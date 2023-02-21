@@ -139,7 +139,6 @@ Global
 		{89812756-7150-4A0C-B764-EF6AF3B96ACB}.Debug_GM Global|Win32.Build.0 = Debug Japanese|Win32
 		{89812756-7150-4A0C-B764-EF6AF3B96ACB}.Debug_GM Global|x64.ActiveCfg = Debug Japanese|Win32
 		{89812756-7150-4A0C-B764-EF6AF3B96ACB}.Release Global|Win32.ActiveCfg = Release Global|Win32
-		{89812756-7150-4A0C-B764-EF6AF3B96ACB}.Release Global|Win32.Build.0 = Release Global|Win32
 		{89812756-7150-4A0C-B764-EF6AF3B96ACB}.Release Global|x64.ActiveCfg = Release Japanese DLL|Win32
 		{89812756-7150-4A0C-B764-EF6AF3B96ACB}.Release_GM Global|Win32.ActiveCfg = Release Japanese DLL|Win32
 		{89812756-7150-4A0C-B764-EF6AF3B96ACB}.Release_GM Global|Win32.Build.0 = Release Japanese DLL|Win32

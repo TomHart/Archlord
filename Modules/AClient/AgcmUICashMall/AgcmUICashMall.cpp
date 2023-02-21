@@ -78,6 +78,8 @@ BOOL AgcmUICashMall::OnAddModule()
 		!AddBoolean())
 		return FALSE;
 
+	m_iCashType = AGPMCASHMALL_TYPE_WCOIN;
+
 	return TRUE;
 }
 
@@ -579,8 +581,8 @@ BOOL AgcmUICashMall::RefreshCashEdit()
 
 #ifdef _AREA_GLOBAL_
 	CashInfoGlobal pCash;
-	
-	m_pagpmBillInfo->SetCashGlobal(m_pcsAgcmCharacter->GetSelfCharacter(), 100000, 0);
+
+	m_pagpmBillInfo->SetCashGlobal(m_pcsAgcmCharacter->GetSelfCharacter(), 100000, 100000);
 	m_pagpmBillInfo->GetCashGlobal(m_pcsAgcmCharacter->GetSelfCharacter(), pCash.m_WCoin, pCash.m_PCoin);
 
 	szBuffer.Format("%s : %d", m_pcsAgcmUIManager2->GetUIMessage(AGCMUIMESSAGE_CASHMALL_C_CASH), (INT64)pCash.m_WCoin);
@@ -731,6 +733,23 @@ BOOL AgcmUICashMall::CBBuyProductConfirm(PVOID pClass, PVOID pData1, PVOID pData
 
 	if (pThis->m_pcsBuyItem){
 		//pThis->m_pcsAgcmUIManager2->ThrowEvent(pThis->m_lEventBuyProductConfirm);
+
+		CashInfoGlobal pCash;
+		INT64	llCash = 0;
+
+		pThis->m_pagpmBillInfo->GetCashGlobal(pThis->m_pcsAgcmCharacter->GetSelfCharacter(), pCash.m_WCoin, pCash.m_PCoin);
+
+		if( AGPMCASHMALL_TYPE_WCOIN == pThis->m_iCashType )
+			llCash	= (INT64)pCash.m_WCoin;
+		else
+			llCash	= (INT64)pCash.m_PCoin;
+
+		INT64	llPrice			= pThis->m_pcsAgpmItem->GetItemPrice(pThis->m_pcsBuyItem);
+
+		if (llPrice > llCash) {
+			pThis->m_pcsAgcmUIManager2->ActionMessageOKDialog("Sorry, you don't have enough to purchase this.");
+			return FALSE;
+		}
 
 		pThis->m_pcsAgcmUIManager2->GetFunction("CashMallBuyProduct")->m_fnCallback( pClass, pData1, pData2, pData3, pData4, pData5, pcsTarget, pcsSourceControl);
 	}

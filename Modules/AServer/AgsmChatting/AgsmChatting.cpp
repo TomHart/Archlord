@@ -626,13 +626,20 @@ BOOL AgsmChatting::ParseCommand(AgpdChatData * pstChatData)
 			AgpdCharacter* pcsAgpdCharacter = m_pagpmCharacter->GetCharacter(pstChatData->pcsSenderBase->m_lID);
 
 			if(m_pagsmSystemMessage){
-				const size_t arraySize = 500;  // Avoid magic numbers!
+				const size_t arraySize = 250;  // Avoid magic numbers!
 				char buffer[arraySize];
 				sprintf(
 					buffer, 
-					"ExpRatio   : %d\nDropRatio  : %d\nDrop2Ratio : %d", 
+					"ExpRatio   : %f\nDropRatio  : %f", 
 					m_pagpmConfig->GetExpAdjustmentRatio(),
-					m_pagpmConfig->GetDropAdjustmentRatio(),
+					m_pagpmConfig->GetDropAdjustmentRatio()
+				);
+				printf(buffer);
+				m_pagsmSystemMessage->SendSystemGeneralString(pcsAgpdCharacter, buffer);
+
+				sprintf(
+					buffer, 
+					"Drop2Ratio : %f", 
 					m_pagpmConfig->GetDrop2AdjustmentRatio()
 				);
 				printf(buffer);
@@ -640,10 +647,7 @@ BOOL AgsmChatting::ParseCommand(AgpdChatData * pstChatData)
 
 				sprintf(
 					buffer, 
-					"GoldRatio  : %d\nCharRatio  : %d", 
-					m_pagpmConfig->GetExpAdjustmentRatio(),
-					m_pagpmConfig->GetDropAdjustmentRatio(),
-					m_pagpmConfig->GetDrop2AdjustmentRatio(),
+					"GoldRatio  : %f\nCharRatio  : %f", 
 					m_pagpmConfig->GetGheldDropAdjustmentRatio(),
 					m_pagpmConfig->GetCharismaDropAdjustmentRatio()
 				);
