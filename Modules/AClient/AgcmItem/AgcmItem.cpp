@@ -1150,10 +1150,6 @@ BOOL AgcmItem::AutoPickupItem()
 	INT32 lCharClass = m_pcsAgpmFactors->GetClass(&pcsSelfCharacter->m_csFactor);
 	INT32 lCharRace = m_pcsAgpmFactors->GetRace(&pcsSelfCharacter->m_csFactor);
 
-	char strCharBuff[256] = { 0, };
-	sprintf_s(strCharBuff, sizeof(strCharBuff), "CharClass: %d\n", lCharClass);
-	OutputDebugString(strCharBuff);
-
 	for (int i = 0; i < lItemCount; ++i)
 	{
 		AgpdItem* pcsItem = m_pcsAgpmItem->GetItem(lItemList[i]);
@@ -1166,13 +1162,7 @@ BOOL AgcmItem::AutoPickupItem()
 			if (fDistance < fNearestItemDistance)
 			{
 				INT32	lItemClass = m_pcsAgpmFactors->GetClass(&pcsItem->m_csRestrictFactor);
-				INT32	lItemRace = m_pcsAgpmFactors->GetRace(&pcsItem->m_csRestrictFactor);
-
- 				
-				char strCharBuff2[256] = { 0, };
-				sprintf_s(strCharBuff2, sizeof(strCharBuff2), "ItemClassRace: %d %d (%s)\n", lItemClass, lItemRace, pcsItem->m_pcsItemTemplate->m_szName);
-				OutputDebugString(strCharBuff2);
-				
+				INT32	lItemRace = m_pcsAgpmFactors->GetRace(&pcsItem->m_csRestrictFactor);		
 				
 				if (lItemClass == 0 || lItemClass == (INT32) AGPM_FACTORS_UPDATE_FACTOR_INIT_VALUE) {
 					continue;

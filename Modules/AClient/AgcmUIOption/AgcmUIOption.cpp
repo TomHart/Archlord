@@ -108,6 +108,7 @@ AgcmUIOption::AgcmUIOption()
 	m_bRefuseGuildBattle = FALSE;
 	m_bRefuseBattle = FALSE;
 	m_bDisableXP = FALSE;
+	m_bAutolootOwn = FALSE;
 
 	m_bRefuseGuildRelation = FALSE;
 	m_bRefuseBuddy = FALSE;
@@ -473,6 +474,10 @@ BOOL AgcmUIOption::OnAddModule()
 	m_pstUDDisableXP = m_pcsAgcmUIManager2->AddUserData("OP_DisableXP", &m_bDisableXP, sizeof(BOOL), 1, AGCDUI_USERDATA_TYPE_BOOL);
 	if (m_pstUDDisableXP < 0)		return FALSE;
 	if (!m_pcsAgcmUIManager2->AddFunction(this, "OP_DisableXP", CBDisableXP, 0))		return FALSE;
+
+	m_pstUDAutolootOwn = m_pcsAgcmUIManager2->AddUserData("OP_AutolootOwn", &m_bAutolootOwn, sizeof(BOOL), 1, AGCDUI_USERDATA_TYPE_BOOL);
+	if (m_pstUDAutolootOwn < 0)		return FALSE;
+	if (!m_pcsAgcmUIManager2->AddFunction(this, "OP_AutolootOwn", CBAutolootOwn, 0))		return FALSE;
 
 	m_pstUDRefusePartyIn = m_pcsAgcmUIManager2->AddUserData("OP_RefusePartyIn", &m_bRefusePartyIn, sizeof(BOOL), 1, AGCDUI_USERDATA_TYPE_BOOL);
 	if (m_pstUDRefusePartyIn < 0)		return FALSE;
@@ -3321,6 +3326,10 @@ BOOL	AgcmUIOption::LoadFromINI(char*	szFile)
 				{
 					csStream.GetValue(&m_bDisableXP);
 				}
+				else if(!strcmp(szValueName, "REF_ALOWN"))
+				{
+					csStream.GetValue(&m_bAutolootOwn);
+				}
 				else if(!strcmp(szValueName, "REF_PIN"))
 				{
 					csStream.GetValue(&m_bRefusePartyIn);
@@ -3484,6 +3493,7 @@ BOOL	AgcmUIOption::SaveToINI(char*		szFileName)
 
 	if(!csStream.WriteValue("REF_TRADE", m_bRefuseTrade))		return FALSE;
 	if(!csStream.WriteValue("REF_DXP", m_bDisableXP))			return FALSE;
+	if(!csStream.WriteValue("REF_ALOWN", m_bAutolootOwn))		return FALSE;
 	if(!csStream.WriteValue("REF_PIN", m_bRefusePartyIn))		return FALSE;
 	if(!csStream.WriteValue("REF_GIN", m_bRefuseGuildIn))		return FALSE;
 	if(!csStream.WriteValue("REF_GBAT", m_bRefuseGuildBattle))	return FALSE;
@@ -3530,6 +3540,23 @@ BOOL AgcmUIOption::CBDisableXP(PVOID pClass, PVOID pData1, PVOID pData2, PVOID p
 		BOOL bClick = (((AcUIButton *) pcsSourceControl->m_pcsBase)->GetButtonMode() == ACUIBUTTON_MODE_CLICK);
 		pThis->SendOptionFlag(AGPDCHAR_OPTION_DISABLE_XP, bClick);
 		pThis->m_pcsAgcmUIManager2->SetUserDataRefresh(pThis->m_pstUDDisableXP);
+	}
+	return FALSE;
+}
+
+
+BOOL AgcmUIOption::CBAutolootOwn(PVOID pClass, PVOID pData1, PVOID pData2, PVOID pData3, PVOID pData4, PVOID pData5, ApBase *pcsTarget, AgcdUIControl *pcsSourceControl)
+{
+	AgcmUIOption *	pThis = (AgcmUIOption *) pClass;
+
+	AgpdCharacter *pcsSelfCharacter = pThis->m_pcsAgcmCharacter->GetSelfCharacter();
+	if (!pcsSelfCharacter) return FALSE;
+
+	if (pcsSourceControl && pcsSourceControl->m_lType == AcUIBase::TYPE_BUTTON)
+	{
+		BOOL bClick = (((AcUIButton *) pcsSourceControl->m_pcsBase)->GetButtonMode() == ACUIBUTTON_MODE_CLICK);
+		pThis->SendOptionFlag(AGPDCHAR_OPTION_AUTO_PICKUP_OWN_ONLY, bClick);
+		pThis->m_pcsAgcmUIManager2->SetUserDataRefresh(pThis->m_pstUDAutolootOwn);
 	}
 	return FALSE;
 }
@@ -3749,6 +3776,7 @@ BOOL AgcmUIOption::CBSettingCharacterOK( PVOID pData, PVOID pClass, PVOID pCustD
 	pThis->m_bRefuseGuildRelation	= FALSE;
 	pThis->m_bRefuseBuddy		= FALSE;
 	pThis->m_bDisableXP		= FALSE;
+	pThis->m_bAutolootOwn = FALSE;
 
 	pThis->RefreshRefuseControl();
 
@@ -3788,6 +3816,7 @@ VOID AgcmUIOption::RefreshRefuseControl(INT32 lOptionFlag)
 	m_bRefuseGuildRelation	= m_pcsAgpmCharacter->IsOptionFlag( lOptionFlag, AGPDCHAR_OPTION_REFUSE_GUILD_RELATION );
 	m_bRefuseBuddy			= m_pcsAgpmCharacter->IsOptionFlag( lOptionFlag, AGPDCHAR_OPTION_REFUSE_BUDDY );
 	m_bDisableXP			= m_pcsAgpmCharacter->IsOptionFlag( lOptionFlag, AGPDCHAR_OPTION_DISABLE_XP );
+	m_bAutolootOwn			= m_pcsAgpmCharacter->IsOptionFlag( lOptionFlag, AGPDCHAR_OPTION_AUTO_PICKUP_OWN_ONLY );
 
 	RefreshRefuseControl();
 }
@@ -3796,6 +3825,7 @@ VOID AgcmUIOption::RefreshRefuseControl()
 {
 	m_pcsAgcmUIManager2->SetUserDataRefresh(m_pstUDRefuseTrade);
 	m_pcsAgcmUIManager2->SetUserDataRefresh(m_pstUDDisableXP);
+	m_pcsAgcmUIManager2->SetUserDataRefresh(m_pstUDAutolootOwn);
 	m_pcsAgcmUIManager2->SetUserDataRefresh(m_pstUDRefusePartyIn);
 	m_pcsAgcmUIManager2->SetUserDataRefresh(m_pstUDRefuseGuildBattle);
 	m_pcsAgcmUIManager2->SetUserDataRefresh(m_pstUDRefuseBattle);

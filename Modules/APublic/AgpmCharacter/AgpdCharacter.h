@@ -285,6 +285,7 @@ typedef enum _AgpdCharacterOptionFlag			//	2005.05.31. By SungHoon	거부 기능 열�
 	AGPDCHAR_OPTION_REFUSE_BUDDY			=	0x00000080,
 	AGPDCHAR_OPTION_AUTO_PICKUP_ONOFF		=	0x00000100,
 	AGPDCHAR_OPTION_DISABLE_XP				=	0x00000200,
+	AGPDCHAR_OPTION_AUTO_PICKUP_OWN_ONLY	=	0x00000400,
 } AgpdCharacterOptionFlag;
 
 typedef enum _eAgpmCharacterTamableType			// 2005.10.04. steeple

@@ -157,14 +157,17 @@ BOOL AgsmDropItem2::DropItem( AgpdCharacter *pcsAgpdCharacter, ApBase *pcsFirstL
 		if (m_pcsAgpmConfig)
 			lMinGhelld = (INT32)(m_pcsAgpmConfig->GetGheldDropAdjustmentRatio(bTPackUser) * (float)lMinGhelld);
 
+
 		// 2005.03.31. steeple
 		// Party 가 아니라면 걍 떨궈주고, 파티라면 근처에 있는 파티원들에게 직접 넣어준다.
+
 		if(!pcsAgpdParty)
 		{
 			if (pcsFirstLooter &&
 				pcsFirstLooter->m_eType == APBASE_TYPE_CHARACTER &&
 				m_pcsAgsmCharacter->IsAutoPickup((AgpdCharacter *) pcsFirstLooter))
 			{
+				
 				INT32 lBonusMoneyByCash = m_pcsAgpmCharacter->GetGameBonusMoney((AgpdCharacter *) pcsFirstLooter);
 				lMinGhelld += (INT32)((double)lMinGhelld * (double)(lBonusMoneyByCash) / (double)100.0);
 
@@ -355,12 +358,22 @@ BOOL AgsmDropItem2::CBDropItem(PVOID pData, PVOID pClass, PVOID pCustData)
 		if (pThis->m_pcsAgsmItem->AddItemToPartyMember(pcsDropInfo->m_pcsFirstLooter, pcsDropInfo->m_pcsDropCharacter, pcsItem) == TRUE)		//	2005.04.22. By SungHoon
 			return TRUE;
 	}
+	
+	BOOL autolootOwn = ((AgpmCharacter *) pcsDropInfo->m_pcsFirstLooter)->IsOptionFlag(((AgpdCharacter *) pcsDropInfo->m_pcsFirstLooter), AGPDCHAR_OPTION_AUTO_PICKUP_OWN_ONLY) == TRUE;
+
+	INT32 lCharClass = pThis->m_pcsAgpmFactors->GetClass(&((AgpdCharacter *) pcsDropInfo->m_pcsFirstLooter)->m_csFactor);
+	INT32 lCharRace = pThis->m_pcsAgpmFactors->GetRace(&((AgpdCharacter *) pcsDropInfo->m_pcsFirstLooter)->m_csFactor);
 
 	if (pcsDropInfo->m_pcsFirstLooter &&
 		pcsDropInfo->m_pcsFirstLooter->m_eType == APBASE_TYPE_CHARACTER &&
 		pThis->m_pcsAgsmCharacter->IsAutoPickup((AgpdCharacter *) pcsDropInfo->m_pcsFirstLooter) &&
 		pcsItem->m_pcsItemTemplate->m_lID != 4608)
 	{
+		if (autolootOwn && !(pThis->m_pcsAgpmFactors->CheckClass((AuCharClassType)lCharClass, &pcsItem->m_csRestrictFactor) && 
+				             pThis->m_pcsAgpmFactors->CheckRace ((AuRaceType)     lCharRace,  &pcsItem->m_csRestrictFactor))) {
+			return pThis->DropItemToField(pcsDropInfo->m_pcsDropCharacter, pcsDropInfo->m_pcsFirstLooter, pcsItem);
+		}
+
 		if (pThis->m_pcsAgpmItem->AddItemToInventory((AgpdCharacter *) pcsDropInfo->m_pcsFirstLooter, pcsItem) != TRUE)
 		{
 			if (pThis->m_pcsAgpmItem->IsEnableSubInventory((AgpdCharacter*)pcsDropInfo->m_pcsFirstLooter))
