@@ -1637,8 +1637,8 @@ BOOL AgcmUILogin::OnLoginResult(INT32 lResult, CHAR *psz)
 	case AGPMLOGIN_RESULT_INVALID_ACCOUNT :
 		pcmUIManager->ThrowEvent(m_lEvent[AGCMUILOGIN_EVENT_ID_FALIED]);
 		// 버그때문에 그냥 클라 종료
-		RsEventHandler(rsQUITAPP, NULL);
-		if (g_eServiceArea == AP_SERVICE_AREA_CHINA)
+		/*RsEventHandler(rsQUITAPP, NULL);*/
+		/*if (g_eServiceArea == AP_SERVICE_AREA_CHINA)
 			::ShellExecute( NULL, "open", "http://reg.sdo.com", NULL, NULL, SW_SHOW );
 		else if (g_eServiceArea == AP_SERVICE_AREA_GLOBAL)
 			::ShellExecute( NULL, "open", "http://www.webzen.com", NULL, NULL, SW_SHOW );
@@ -1646,22 +1646,22 @@ BOOL AgcmUILogin::OnLoginResult(INT32 lResult, CHAR *psz)
 		::ShellExecute(NULL, "open", "http://archlord.wpark.com.tw", NULL, NULL, SW_SHOW);
 		else
 			::ShellExecute( NULL, "open", "http://id.naver.com/help/work.php?work=pwinquiry", NULL, NULL, SW_SHOW );
-		break;
+		break;*/
 
 	case AGPMLOGIN_RESULT_INVALID_PASSWORD :
 		{
 			OnAddLoginRetryCount( pcmUIManager );
 
 			// 버그때문에 그냥 클라 종료
-			RsEventHandler(rsQUITAPP, NULL);
-			if (g_eServiceArea == AP_SERVICE_AREA_CHINA)
+			/*RsEventHandler(rsQUITAPP, NULL);*/
+			/*if (g_eServiceArea == AP_SERVICE_AREA_CHINA)
 				::ShellExecute( NULL, "open", "http://reg.sdo.com", NULL, NULL, SW_SHOW );
 			else if (g_eServiceArea == AP_SERVICE_AREA_GLOBAL)
 				::ShellExecute( NULL, "open", "http://www.webzen.com", NULL, NULL, SW_SHOW );
 			else if(g_eServiceArea == AP_SERVICE_AREA_TAIWAN)
 			::ShellExecute(NULL, "open", "http://archlord.wpark.com.tw", NULL, NULL, SW_SHOW);
 			else
-				::ShellExecute( NULL, "open", "http://id.naver.com/help/work.php?work=pwinquiry", NULL, NULL, SW_SHOW );
+				::ShellExecute( NULL, "open", "http://id.naver.com/help/work.php?work=pwinquiry", NULL, NULL, SW_SHOW );*/
 		}
 		break;	
 
@@ -2675,16 +2675,16 @@ BOOL AgcmUILogin::CBResultNotApplied(PVOID pClass, INT32 lTrueCancel, CHAR* szIn
 
 BOOL AgcmUILogin::CBIDFailed(PVOID pClass, INT32 lTrueCancel, CHAR* szInputMessage )
 {
-#ifdef _AREA_GLOBAL_
-	RsEventHandler( rsQUITAPP , NULL );
-#endif
+//#ifdef _AREA_GLOBAL_
+//	RsEventHandler( rsQUITAPP , NULL );
+//#endif
 	return TRUE;
 }
 
 
 BOOL AgcmUILogin::CBPasswordFailed(PVOID pClass, INT32 lTrueCancel, CHAR* szInputMessage )
 {
-	RsEventHandler(rsQUITAPP, NULL);
+	/*RsEventHandler(rsQUITAPP, NULL);*/
 
 	if (g_eServiceArea == AP_SERVICE_AREA_CHINA)
 		::ShellExecute(NULL, "open", "http://reg.sdo.com", NULL, NULL, SW_SHOW);

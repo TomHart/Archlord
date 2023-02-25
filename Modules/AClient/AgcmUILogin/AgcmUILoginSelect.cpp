@@ -35,8 +35,22 @@ VOID	AgcmUILoginSelect::OpenLoginSelect( VOID )
 {
 	INT	nGroupCount	=	m_ArchlordLoginInfo.GetGroupCount();
 
-	// Group이 존재하면 선택창을 띄운다.
-	if( nGroupCount > 0 )
+	if( nGroupCount == 1) 
+	{
+		stLoginGroup* pGroup = m_ArchlordLoginInfo.GetGroup(0);
+
+		srand( time(NULL) );
+		INT nRand	=	rand() % pGroup->m_vecServerInfo.size();
+
+		m_pcmLogin->ConnectLoginServer(pGroup->m_vecServerInfo[ nRand ].m_strServerIP.c_str());	
+		pGroup->m_vecServerInfo[ nRand ].m_bTryConnect	=	TRUE;
+
+		if( g_pEngine )
+		{
+			g_pEngine->WaitingDialog( NULL, m_pUIManager->GetUIMessage( "LOGIN_WAITING" ) );
+		}
+	}
+	else if( nGroupCount > 0 )
 	{
 		g_pEngine->m_pCurrentFullUIModule->AddChild((AgcWindow*)&m_csLoginSelectUI);
 		m_csLoginSelectUI.ShowWindow( TRUE );

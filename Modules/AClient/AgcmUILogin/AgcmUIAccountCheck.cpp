@@ -306,7 +306,7 @@ BOOL AgcmUIAccountCheck::CB_OnConnect( void* pData, void* pClass, void* pCustomD
 #endif
 						)
 					{
-						g_pEngine->OnTerminate();
+						/*g_pEngine->OnTerminate();*/
 					}
 				}
 			}

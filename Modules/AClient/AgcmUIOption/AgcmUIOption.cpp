@@ -3850,6 +3850,7 @@ VOID AgcmUIOption::SendOptionFlag()
 	if (m_bRefuseGuildRelation)	lOptionFlag = m_pcsAgpmCharacter->SetOptionFlag(lOptionFlag, AGPDCHAR_OPTION_REFUSE_GUILD_RELATION);
 	if (m_bRefuseBuddy)			lOptionFlag = m_pcsAgpmCharacter->SetOptionFlag(lOptionFlag, AGPDCHAR_OPTION_REFUSE_BUDDY);
 	if (m_bDisableXP)			lOptionFlag = m_pcsAgpmCharacter->SetOptionFlag(lOptionFlag, AGPDCHAR_OPTION_DISABLE_XP);
+	if (m_bAutolootOwn)			lOptionFlag = m_pcsAgpmCharacter->SetOptionFlag(lOptionFlag, AGPDCHAR_OPTION_AUTO_PICKUP_ONOFF);
 
 	m_pcsAgcmCharacter->SendPacketOptionFlag(pcsSelfCharacter, lOptionFlag);
 }
