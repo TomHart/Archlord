@@ -2507,9 +2507,16 @@ BOOL	AgcmUIMain::UseBelt( INT32 nLayer , INT32 nIndex )
 
 				if( m_pcsAgcmSkill->CastSkillCheck( pcsGridItem->m_lItemID , (ApBase *) m_pcsAgpmCharacter->GetCharacter(lTargetID) , NULL , bForce ) )
 				{
+					OutputDebugStr("Passed :)\n");
+					char szBuf[255];
+					sprintf(szBuf, "id = %d, tid = %d\n", pcsGridItem->m_lItemID ,pcsGridItem->m_lItemTID);
+					OutputDebugString(szBuf);
 					ProcessSkill(pcsGridItem->m_lItemID);
 					return TRUE;
+				} else {
+					
 				}
+
 			}
 		}
 

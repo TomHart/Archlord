@@ -522,8 +522,8 @@ LuaGlue	LG_EndCharPolyMorph( lua_State *L )
 
 LuaGlue	LG_AutoHunt( lua_State *L )
 {
-	//AuLua * pLua = AuLua::GetPointer();
-	//g_MyEngine.m_pMainWindow->AutoHunt();
+	AuLua * pLua = AuLua::GetPointer();
+	g_cMyEngine.m_pMainWindow->AutoHunt();
 	return 0;
 }
 

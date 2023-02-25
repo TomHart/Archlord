@@ -1365,15 +1365,20 @@ BOOL AgcmSkill::CastSkillCheck(INT32 lSkillID, ApBase *pcsTargetBase, AuPOS *ppo
 	// 스킬이 사용 가능한지 확인.
 	// return TRUE 면 바로 사용 가능.
 	AgpdSkill *pcsSkill = m_pcsAgpmSkill->GetSkill(lSkillID);
-	if (!pcsSkill)
+	if (!pcsSkill){
+		OutputDebugStr("Here 1\n");
 		return FALSE;
-
-	if (!m_pcsAgcmCharacter->m_pcsSelfCharacter)
+	}
+	
+	if (!m_pcsAgcmCharacter->m_pcsSelfCharacter) {
+		OutputDebugStr("Here 2\n");
 		return FALSE;
+	}
 
 	if (!m_pcsAgpmCharacter->IsArchlord(m_pcsAgcmCharacter->m_pcsSelfCharacter) &&
 		m_pcsAgcmCharacter->m_pcsSelfCharacter->m_bIsTrasform)
 	{
+		OutputDebugStr("Here 3\n");
 		return FALSE;
 	}
 
@@ -1382,6 +1387,7 @@ BOOL AgcmSkill::CastSkillCheck(INT32 lSkillID, ApBase *pcsTargetBase, AuPOS *ppo
 		m_pcsAgcmCharacter->m_pcsSelfCharacter->m_bRidable)
 	{
 		// 탈것은 UI Module이 없기 때문에 AgcmUIEventItemRepair에서 신세진다~~ kermi..
+		OutputDebugStr("Here 4\n");
 		return FALSE;
 	}
 
@@ -1405,8 +1411,10 @@ BOOL AgcmSkill::CastSkillCheck(INT32 lSkillID, ApBase *pcsTargetBase, AuPOS *ppo
 
 	if (m_bFollowCastLock && pcsTargetBase &&
 		m_lFollowCastTargetID == pcsTargetBase->m_lID &&
-		m_lFollowCastSkillID == pcsSkill->m_lID)
+		m_lFollowCastSkillID == pcsSkill->m_lID) {
+		OutputDebugStr("Here 6\n");
 		return FALSE;
+	}
 
 	//ApBase *pcsBase = m_pcsApmEventManager->GetBase(m_csSelectedBase.m_eType, m_csSelectedBase.m_lID);
 	ApBase *pcsBase = NULL;
@@ -1432,6 +1440,7 @@ BOOL AgcmSkill::CastSkillCheck(INT32 lSkillID, ApBase *pcsTargetBase, AuPOS *ppo
 
 	if (!m_pcsAgpmSkill->IsSatisfyRequirement(pcsSkill))
 	{
+		OutputDebugStr("Here 7\n");
 		return FALSE;
 	}
 
@@ -1440,12 +1449,14 @@ BOOL AgcmSkill::CastSkillCheck(INT32 lSkillID, ApBase *pcsTargetBase, AuPOS *ppo
 	eAgpmSkillActionType	eActionType	= AGPMSKILL_ACTION_NOT_ENOUGH_HP;
 	if (!m_pcsAgpmSkill->IsSufficientCost(pcsSkill, &eActionType))
 	{
+		OutputDebugStr("Here 8\n");
 		return FALSE;
 	}
 
 	// 사용 가능 시간이 되었는지 검사한다.
 	if (pcsSkill->m_ulRecastDelay > m_pcsAgcmCharacter->m_ulCurTick)
 	{
+		OutputDebugStr("Here 9\n");
 		return FALSE;
 	}
 
@@ -1458,6 +1469,7 @@ BOOL AgcmSkill::CastSkillCheck(INT32 lSkillID, ApBase *pcsTargetBase, AuPOS *ppo
 	if (!m_pcsAgpmSkill->CheckSkillPvP(pcsSkill, pcsBase))
 	{
 		// 별달리 처리 해주지 말고 걍 리턴 FALSE 해주자.
+		OutputDebugStr("Here 10\n");
 		return FALSE;
 	}
 

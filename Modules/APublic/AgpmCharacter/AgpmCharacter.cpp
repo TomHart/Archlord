@@ -5967,11 +5967,13 @@ BOOL AgpmCharacter::ClearActionBlockTime(AgpdCharacter *pcsCharacter)
 
 BOOL AgpmCharacter::IsActionBlockCondition(AgpdCharacter *pcsCharacter, AgpdCharacterActionBlockType eBlockType)
 {
-	if (!pcsCharacter)
+	if (!pcsCharacter){
 		return FALSE;
+	}
 
-	if (!pcsCharacter->m_bIsActionBlock)
+	if (!pcsCharacter->m_bIsActionBlock){
 		return FALSE;
+	}
 
 	BOOL	bIsCheckBlockTime	= FALSE;
 
@@ -5991,8 +5993,10 @@ BOOL AgpmCharacter::IsActionBlockCondition(AgpdCharacter *pcsCharacter, AgpdChar
 
 	case AGPDCHAR_ACTION_BLOCK_TYPE_SKILL:
 		{
-			if (pcsCharacter->m_eActionBlockType == AGPDCHAR_ACTION_BLOCK_TYPE_ATTACK)
+			OutputDebugStr(pcsCharacter->m_szNickName);
+			if (pcsCharacter->m_eActionBlockType == AGPDCHAR_ACTION_BLOCK_TYPE_ATTACK) {
 				return FALSE;
+			}
 
 			bIsCheckBlockTime	= TRUE;
 		}
@@ -6001,8 +6005,12 @@ BOOL AgpmCharacter::IsActionBlockCondition(AgpdCharacter *pcsCharacter, AgpdChar
 
 	if (bIsCheckBlockTime)
 	{
-		if (pcsCharacter->m_ulActionBlockTime > GetClockCount())
+		if (pcsCharacter->m_ulActionBlockTime > GetClockCount()) {
+		/*	char szBuf[255];
+			sprintf(szBuf, "pcsCharacter->m_ulActionBlockTime > GetClockCount() = %d > %d\n", pcsCharacter->m_ulActionBlockTime, GetClockCount());
+			OutputDebugString(szBuf);*/
 			return TRUE;
+		}
 
 		pcsCharacter->m_bIsActionBlock		= FALSE;
 	}

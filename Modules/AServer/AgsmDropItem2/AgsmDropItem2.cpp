@@ -369,8 +369,14 @@ BOOL AgsmDropItem2::CBDropItem(PVOID pData, PVOID pClass, PVOID pCustData)
 		pThis->m_pcsAgsmCharacter->IsAutoPickup((AgpdCharacter *) pcsDropInfo->m_pcsFirstLooter) &&
 		pcsItem->m_pcsItemTemplate->m_lID != 4608)
 	{
-		if (autolootOwn && !(pThis->m_pcsAgpmFactors->CheckClass((AuCharClassType)lCharClass, &pcsItem->m_csRestrictFactor) && 
-				             pThis->m_pcsAgpmFactors->CheckRace ((AuRaceType)     lCharRace,  &pcsItem->m_csRestrictFactor))) {
+		if (
+			autolootOwn && 
+			!(
+				pThis->m_pcsAgpmFactors->CheckClass((AuCharClassType)lCharClass, &pcsItem->m_csRestrictFactor) && 
+				pThis->m_pcsAgpmFactors->CheckRace ((AuRaceType)     lCharRace,  &pcsItem->m_csRestrictFactor) && 
+				pThis->m_pcsAgpmFactors->GetClass (&pcsItem->m_csRestrictFactor) != AUCHARCLASS_TYPE_NONE
+			)
+		) {
 			return pThis->DropItemToField(pcsDropInfo->m_pcsDropCharacter, pcsDropInfo->m_pcsFirstLooter, pcsItem);
 		}
 

@@ -1960,7 +1960,8 @@ BOOL			AgcmUIManager2::StreamReadCB(PVOID pData, ApModule *pClass, ApModuleStrea
 
 			sscanf(szValue, "%d:%s", &pcsUI->m_bUseParentPosition, pcsUI->m_szParentUIName);
 		}
-		else if (!strcmp(szValueName, AGCMUIMANAGER2_NAME_UI_TYPE))
+		else if (!strcmp(szValueName, 
+			AGCMUIMANAGER2_NAME_UI_TYPE))
 		{
 			if (!pcsUI)
 				return FALSE;

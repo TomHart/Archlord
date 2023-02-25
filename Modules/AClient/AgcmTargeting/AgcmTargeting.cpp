@@ -235,10 +235,8 @@ BOOL AgcmTargeting::OnInit()
 		AS_REGISTER_VARIABLE(string, m_szTargetName);
 		AS_REGISTER_VARIABLE(int, m_lUsePathFind);
 
-		#ifdef _DEBUG
-		AS_REGISTER_METHOD0(void, TargetNearestDebug);
-		AS_REGISTER_METHOD0(void, TargetNextDebug);
-		#endif // _DEBUG
+		//AS_REGISTER_METHOD0(void, TargetNearestDebug);
+		//AS_REGISTER_METHOD0(void, TargetNextDebug);
 	AS_REGISTER_TYPE_END;
 
 	return TRUE;

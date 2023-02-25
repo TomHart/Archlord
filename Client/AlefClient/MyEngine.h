@@ -236,7 +236,7 @@
 
 #pragma warning ( pop )
 
-//#define _BIN_EXEC_
+// #define _BIN_EXEC_
 
 class AgcmCustomizeRender;
 

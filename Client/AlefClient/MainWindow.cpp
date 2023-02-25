@@ -559,14 +559,17 @@ BOOL MainWindow::LoadTemplates()
 		if(!pFile)		// 없으면
 		{
 			// 분할된 파일만 읽는다
+			OutputDebugStr("Here 1");
 			bResult = g_pcsAgpmItem->StreamReadTemplates( "Ini\\ItemTemplate", "INI\\ItemTemplateEntry.ini", NULL, m_bDecryption );
 		}
 		else			// 테스트파일이 존재하면
 		{
 			// 통파일 먼저 읽어보고
+			OutputDebugStr("Here 2");
 			bResult = g_pcsAgpmItem->StreamReadTemplate( "Ini\\ItemTemplateAll.ini", NULL, m_bDecryption );
 			if( !bResult )
 			{
+				OutputDebugStr("Here 3");
 				// 통파일 읽기에 실패하면 쪼갠 파일 읽기를 시도한다.
 				bResult = g_pcsAgpmItem->StreamReadTemplates( "Ini\\ItemTemplate", "INI\\ItemTemplateEntry.ini", NULL, m_bDecryption );
 			}
@@ -3097,14 +3100,17 @@ void MainWindow::IntensiveCrash()
 
 void	MainWindow::AutoHuntIdle()
 {
-	#ifndef _AREA_GLOBAL_
 	if( g_pEngine->GetDebugFlag() & AgcEngine::AUTO_HUNTING )
 	{
 		AgpdCharacter * pSelfCharacter = g_pcsAgcmCharacter->GetSelfCharacter();
 		if( !pSelfCharacter ) return;
 
 		INT32 nTargetCID = pSelfCharacter->m_alTargetCID[ 0 ];
+		
 		AgpdCharacter * pTarget = g_pcsAgpmCharacter->GetCharacter( nTargetCID );
+
+		/*OutputDebugStr(pSelfCharacter->m_szID);
+		OutputDebugStr(pTarget->m_szID);*/
 
 		// 자동 사냥 Process 
 
@@ -3112,7 +3118,7 @@ void	MainWindow::AutoHuntIdle()
 		// 타겟을 잡고 있는 것이 없으면 근처에 몬스터 검색해서 돌진.
 		// 근처에 타겟이 없는 경우 매크로 스타트 지점으로 이동.
 
-		if( nTargetCID && pTarget && !pTarget->IsDead() )
+		if( nTargetCID && pTarget && !pTarget->IsDead())
 		{
 			// 타겟을 잡고 있는 경우..
 			// 직접 클릭하고 랜덤 스킬을 실행한다.
@@ -3120,10 +3126,23 @@ void	MainWindow::AutoHuntIdle()
 
 			// 스킬을 사용한다.
 
-			for( int i = 0 ; i < 6 ; i ++ )
+			/*for( int i = 0 ; i <= 1 ; i ++ )
 			{
-				if( g_pcsAgcmUIMain->UseBelt( 0 , i ) ) break;
-			}
+				for( int j = 0 ; j <= 9 ; j ++ )
+				{*/
+			g_pcsAgcmUIMain->CBQuickBeltUse_1(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+			g_pcsAgcmUIMain->CBQuickBeltUse_2(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+			g_pcsAgcmUIMain->CBQuickBeltUse_3(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+			g_pcsAgcmUIMain->CBQuickBeltUse_4(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+			g_pcsAgcmUIMain->CBQuickBeltUse_5(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+			g_pcsAgcmUIMain->CBQuickBeltUse_6(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+			g_pcsAgcmUIMain->CBQuickBeltUse_7(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+			g_pcsAgcmUIMain->CBQuickBeltUse_8(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+			g_pcsAgcmUIMain->CBQuickBeltUse_9(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+			g_pcsAgcmUIMain->CBQuickBeltUse_10(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+			//g_pcsAgcmUIMain->UseBelt(0, 0);
+				/*}
+			}*/
 		}
 		else
 		{
@@ -3171,7 +3190,6 @@ void	MainWindow::AutoHuntIdle()
 		}
 		
 	}
-	#endif
 }
 
 BOOL	MainWindow::CBObjectLoadError(PVOID pData, PVOID pClass, PVOID pCustData)
