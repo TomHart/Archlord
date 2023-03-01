@@ -854,6 +854,7 @@ BOOL ServerEngine::OnRegisterModule()
 	printf("Processing - 33\n");
 	if (!g_pcsAgpmItem->			StreamReadTemplate("ini\\ItemTemplateAll.ini", NULL, ENC_SVR_DATA)	)
 	{
+		OutputDebugStr("ItemTemplateAll reading failed");
 		if (!g_pcsAgpmItem->			StreamReadTemplates("Ini\\ItemTemplate", "ini\\ItemTemplateEntry.ini", NULL, ENC_SVR_DATA)	)
 		{
 			ASSERT( !"g_csAgpmItem StreamReadTemplate ½ÇÆÐ" );

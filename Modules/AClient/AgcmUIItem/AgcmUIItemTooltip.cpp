@@ -1675,7 +1675,8 @@ BOOL AgcmUIItem::SetItemToolTipName(AgpdItem *pcsItem, BOOL bIsNPCTradeGrid)
 #ifdef _DEBUG
 	sprintf(strTemp, "%s (%d)", ((AgpdItemTemplate *) pcsItem->m_pcsItemTemplate)->m_szName, ((AgpdItemTemplate *) pcsItem->m_pcsItemTemplate)->m_lID);
 #else
-	sprintf(strTemp, "%s", ((AgpdItemTemplate *) pcsItem->m_pcsItemTemplate)->m_szName);
+	sprintf(strTemp, "%s (%d)", ((AgpdItemTemplate *) pcsItem->m_pcsItemTemplate)->m_szName, ((AgpdItemTemplate *) pcsItem->m_pcsItemTemplate)->m_lID);
+	//sprintf(strTemp, "%s", ((AgpdItemTemplate *) pcsItem->m_pcsItemTemplate)->m_szName);
 #endif
 	if (!bIsNPCTradeGrid)
 	{

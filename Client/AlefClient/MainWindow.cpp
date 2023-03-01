@@ -21,6 +21,9 @@
 #include "ApUtil.h"
 #include "ApMemoryTracker.h"
 #include "AuProfileManager.h"
+#include "ApModule.h"
+#include "ApModuleManager.h"
+#include "AuTickCounter.h"
 
 #include "MyEngine.h"
 #include "MainWindow.h"
@@ -333,6 +336,9 @@ MainWindow::MainWindow( MyEngine& cMyEngine ) : m_cMyEngine( cMyEngine )
 
 	m_bShowRidableInfo		= FALSE;
 	m_bEnableTheaterMode	= FALSE;
+
+	m_ulAutoHuntCycle	= 0;
+	m_ulAutoHuntIndex	= 0;
 
 #ifdef _BIN_EXEC_
 	m_bDecryption = FALSE;
@@ -1489,6 +1495,9 @@ void		MainWindow::AutoHunt()
 	else
 	{
 		// 플래그 켜기..
+		// Enable
+		m_ulAutoHuntCycle = GetTickCount();
+		m_ulAutoHuntIndex = 0;
 		g_pEngine->SetDebugFlag( g_pEngine->GetDebugFlag() | AgcEngine::AUTO_HUNTING );
 		print_ui_console( "자동사냥을 시작합니다." );
 	}
@@ -3124,25 +3133,100 @@ void	MainWindow::AutoHuntIdle()
 			// 직접 클릭하고 랜덤 스킬을 실행한다.
 			g_pcsAgcmTargeting->TargetCID( nTargetCID , TRUE );
 
-			// 스킬을 사용한다.
+			if (GetTickCount() - m_ulAutoHuntCycle >= 100) {
+				m_ulAutoHuntCycle = GetTickCount();
 
-			/*for( int i = 0 ; i <= 1 ; i ++ )
-			{
-				for( int j = 0 ; j <= 9 ; j ++ )
-				{*/
-			g_pcsAgcmUIMain->CBQuickBeltUse_1(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-			g_pcsAgcmUIMain->CBQuickBeltUse_2(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-			g_pcsAgcmUIMain->CBQuickBeltUse_3(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-			g_pcsAgcmUIMain->CBQuickBeltUse_4(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-			g_pcsAgcmUIMain->CBQuickBeltUse_5(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-			g_pcsAgcmUIMain->CBQuickBeltUse_6(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-			g_pcsAgcmUIMain->CBQuickBeltUse_7(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-			g_pcsAgcmUIMain->CBQuickBeltUse_8(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-			g_pcsAgcmUIMain->CBQuickBeltUse_9(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-			g_pcsAgcmUIMain->CBQuickBeltUse_10(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-			//g_pcsAgcmUIMain->UseBelt(0, 0);
-				/*}
-			}*/
+				switch(m_ulAutoHuntIndex){
+					case 0:
+						g_pcsAgcmUIMain->CBQuickBeltUse_1(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 1:
+						g_pcsAgcmUIMain->CBQuickBeltUse_2(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 2:
+						g_pcsAgcmUIMain->CBQuickBeltUse_3(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 3:
+						g_pcsAgcmUIMain->CBQuickBeltUse_4(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 4:
+						g_pcsAgcmUIMain->CBQuickBeltUse_5(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 5:
+						g_pcsAgcmUIMain->CBQuickBeltUse_6(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 6:
+						g_pcsAgcmUIMain->CBQuickBeltUse_7(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 7:
+						g_pcsAgcmUIMain->CBQuickBeltUse_8(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 8:
+						g_pcsAgcmUIMain->CBQuickBeltUse_9(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 9:
+						g_pcsAgcmUIMain->CBQuickBeltUse_10(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 10:
+						g_pcsAgcmUIMain->CBQuickBeltLayerUp(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 11:
+						g_pcsAgcmUIMain->CBQuickBeltUse_1(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 12:
+						g_pcsAgcmUIMain->CBQuickBeltUse_2(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 13:
+						g_pcsAgcmUIMain->CBQuickBeltUse_3(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 14:
+						g_pcsAgcmUIMain->CBQuickBeltUse_4(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 15:
+						g_pcsAgcmUIMain->CBQuickBeltUse_5(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 16:
+						g_pcsAgcmUIMain->CBQuickBeltUse_6(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 17:
+						g_pcsAgcmUIMain->CBQuickBeltUse_7(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 18:
+						g_pcsAgcmUIMain->CBQuickBeltUse_8(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 19:
+						g_pcsAgcmUIMain->CBQuickBeltUse_9(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 20:
+						g_pcsAgcmUIMain->CBQuickBeltUse_10(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex++;
+						break;
+					case 21:
+						g_pcsAgcmUIMain->CBQuickBeltLayerDown(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+						m_ulAutoHuntIndex = 0;
+						break;
+				}
+			}
 		}
 		else
 		{
@@ -3166,8 +3250,14 @@ void	MainWindow::AutoHuntIdle()
 				if( !g_pcsAgpmCharacter->IsMonster( pcsCharacter ) ) continue;
 
 				// 살아있는지
-
 				if( pcsCharacter->IsDead() ) continue;
+
+				UINT32 nameColor = pcsCharacter->m_pcsCharacterTemplate->m_ulIDColor;
+				if(nameColor == 12428907){
+					// Boss
+					pcsCharacterNearest = pcsCharacter;
+					break;
+				}
 
 				// 거리 확인
 				FLOAT	fDistance;

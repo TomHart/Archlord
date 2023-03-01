@@ -5,6 +5,9 @@
 
 #include "AgcEngine.h"
 #include "rtimport.h"
+#include "ApModule.h"
+#include "ApModuleManager.h"
+#include "AuTickCounter.h"
 
 
 //#include <DShowMng.h>
@@ -147,6 +150,9 @@ public:
 
 	BOOL		m_bShowRidableInfo;
 	BOOL		m_bEnableTheaterMode;
+	
+	UINT32		m_ulAutoHuntCycle;
+	UINT32		m_ulAutoHuntIndex;
 
 	RwIm3DVertex*		m_pLineList;
 	RwImVertexIndex*	m_pIndex;

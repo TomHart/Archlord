@@ -538,6 +538,11 @@ BOOL AgpmItem::TemplateReadCB(PVOID pData, ApModule *pClass, ApModuleStream *pSt
 			INT32 lBuffer = 0;
 			pStream->GetValue(&lBuffer);
 
+			if (lBuffer == 99) {
+				OutputDebugStr("Upping to 9999\n");
+				lBuffer = 9999;
+			}
+
 			pcsTemplate->m_lMaxStackableCount = lBuffer;
 		}
 		else if (!strcmp(szValueName, AGPMITEM_INI_NAME_LightInfo))
@@ -700,11 +705,18 @@ BOOL AgpmItem::StreamReadTemplate(CHAR *szFile, CHAR *pszErrorMessage, BOOL bDec
 
 	nNumKeys = csStream.GetNumSections();
 
+	char szBuf1[255];
+	sprintf(szBuf1, "nNumKeys = %d\n", nNumKeys);
+	OutputDebugString(szBuf1);
+
 	// 각 Section에 대해서...
 	for (i = 0; i < nNumKeys; i++)
 	{
 		// Section Name은 TID 이다.
 		lTID = atoi(csStream.ReadSectionName(i));
+		char szBuf2[255];
+		sprintf(szBuf2, "lTID = %d\n", lTID);
+		OutputDebugString(szBuf2);
 
 		// Template을 추가한다.
 		pcsAgpdItemTemplate = AddItemTemplate(lTID);
@@ -725,6 +737,9 @@ BOOL AgpmItem::StreamReadTemplate(CHAR *szFile, CHAR *pszErrorMessage, BOOL bDec
 		}
 
 		char* pTemplateName = GetItemTemplateName( pcsAgpdItemTemplate->m_lID );
+		char szBuf3[255];
+		sprintf(szBuf3, "m_lID = %d, pTemplateName = %s\n", pcsAgpdItemTemplate->m_lID, pTemplateName);
+		OutputDebugString(szBuf3);
 		if( pTemplateName && strlen( pTemplateName ) > 0 )
 		{
 			// 엔트리파일에서 읽어들인 이름이 있다면 그걸로 이름을 바꿔준다.
@@ -818,9 +833,7 @@ BOOL AgpmItem::StreamReadTemplates( char* pPathName, char* pEntryFileName, char*
 				if( pErrorString )
 				{
 					sprintf( pErrorString, "ERROR: Failed to load Item Template. ( FileName = %s )", pTemplateEntry->m_strTemplateFileName );
-#ifdef _DEBUG
 					OutputDebugString( pErrorString );
-#endif
 				}
 			}
 		}
@@ -2186,7 +2199,13 @@ BOOL AgpmItem::StreamReadImportData(CHAR *szFile, CHAR *szDebugString, BOOL bDec
 					pszData = pExcel->GetData(nCol, nRow);
 					if(pszData)
 					{
-						pcsAgpdItemTemplate->m_lMaxStackableCount = atoi(pszData);
+						INT32 iStackSize = atoi(pszData);
+						if (iStackSize == 99) {
+							OutputDebugStr("Upping to 9999\n");
+							iStackSize = 9999;
+						}
+
+						pcsAgpdItemTemplate->m_lMaxStackableCount = iStackSize;
 
 						if (pcsAgpdItemTemplate->m_lMaxStackableCount > 0)
 							pcsAgpdItemTemplate->m_bStackable	= TRUE;

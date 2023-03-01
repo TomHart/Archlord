@@ -723,6 +723,15 @@ BOOL AgsmAdmin::ParseCommand(AgpdChatData * pstChatData, BOOL bCheckAdmin)
 
 		return ProcessCommandCreate(pcsAgpdCharacter, pstChatData->szMessage + j, pstChatData->lMessageLength - (j), 1);
 	}
+	else if(strncmp(pstChatData->szMessage + i, "/create99", k - i) == 0)
+	{
+		if(!pcsAgpdCharacter 
+			|| (!m_pagpmAdmin->IsAdminCharacter(pcsAgpdCharacter) || m_pagpmAdmin->GetAdminLevel(pcsAgpdCharacter) < AGPMADMIN_LEVEL_3)
+			&& !CheckAdminTypeSpecial(pcsAgpdCharacter, pstChatData->szMessage + i, k-1))
+			return FALSE;
+
+		return ProcessCommandCreate(pcsAgpdCharacter, pstChatData->szMessage + j, pstChatData->lMessageLength - (j), 99);
+	}
 	//else if (strncmp(pstChatData->szMessage + i, "/createcash", k - i) == 0)
 	//{
 	//	if(!m_pagpmAdmin->IsAdminCharacter(pcsAgpdCharacter))
@@ -797,10 +806,15 @@ BOOL AgsmAdmin::ParseCommand(AgpdChatData * pstChatData, BOOL bCheckAdmin)
 
 		AgsdCharacter	*pcsAgsdCharacter	= m_pagsmCharacter->GetADCharacter(pcsAgpdCharacter);
 		
-		if (pcsAgsdCharacter->m_bIsSuperMan)
+		if (pcsAgsdCharacter->m_bIsSuperMan){
 			pcsAgsdCharacter->m_bIsSuperMan		= FALSE;
-		else
+			m_pagpmCharacter->UpdateUnsetSpecialStatus(pcsAgpdCharacter, AGPDCHAR_SPECIAL_STATUS_STUN_PROTECT);
+		}
+		else {
 			pcsAgsdCharacter->m_bIsSuperMan		= TRUE;
+			m_pagpmCharacter->UpdateSetSpecialStatus(pcsAgpdCharacter, AGPDCHAR_SPECIAL_STATUS_STUN_PROTECT);
+		}
+			
 
 		return TRUE;
 	}
