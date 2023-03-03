@@ -3067,6 +3067,9 @@ BOOL AgsmAdmin::ProcessCommandCreate(AgpdCharacter* pcsAgpdCharacter, CHAR* szMe
 
 	CHAR* pszPhysicalConvert = NULL;
 	strtok_s(szBuf, "_", &pszPhysicalConvert);
+	
+	CHAR* pszSocket = NULL;
+	strtok_s(szBuf, "-", &pszSocket);
 
 	// Item Template ID
 	INT32 lTID = atoi(szBuf);
@@ -3102,6 +3105,11 @@ BOOL AgsmAdmin::ProcessCommandCreate(AgpdCharacter* pcsAgpdCharacter, CHAR* szMe
 	if (pszPhysicalConvert)
 	{
 		m_pagpmItemConvert->SetPhysicalConvert( pcsAgpdItem, atoi(pszPhysicalConvert), FALSE );
+	}
+	
+	if (pszSocket)
+	{
+		m_pagpmItemConvert->SetSocketConvert( pcsAgpdItem, atoi(pszSocket) );
 	}
 
 	AgsdCharacter	*pcsAgsdCharacter	= m_pagsmCharacter->GetADCharacter(pcsAgpdCharacter);

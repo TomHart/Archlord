@@ -1673,6 +1673,10 @@ BOOL AgcmSkill::CastSkill(INT32 lSkillID, ApBase *pcsTargetBase, AuPOS *pposTarg
 		// 아직 사용 가능한 스킬이 아니다. 시간이 더 지나야 한다.
 		eCheckCastSkillResult	= AGPMSKILL_ACTION_NOT_READY_CAST;
 
+		char szBuf[255];
+		sprintf(szBuf, "pcsSkill->m_ulRecastDelay > m_pcsAgcmCharacter->m_ulCurTick (%f > %f)\n", pcsSkill->m_ulRecastDelay, m_pcsAgcmCharacter->m_ulCurTick);
+		OutputDebugString(szBuf);
+
 		EnumCallback(AGCMSKILL_CB_ID_CHECK_CAST_SKILL_RESULT, (PVOID) eCheckCastSkillResult, NULL);
 
 		//m_pcsAgcmCharacter->m_pcsSelfCharacter->m_stNextAction.m_eActionType	= AGPDCHAR_ACTION_TYPE_NONE;

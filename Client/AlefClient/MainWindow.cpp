@@ -1898,7 +1898,7 @@ BOOL MainWindow::OnKeyDown( RsKeyStatus *ks	)
 
 	return TRUE;
 }
-
+                                                                                                                                                
 BOOL MainWindow::OnKeyUp( RsKeyStatus *ks	)
 {
     switch( ks->keyCharCode )
@@ -1918,7 +1918,7 @@ BOOL MainWindow::OnKeyUp( RsKeyStatus *ks	)
 #endif // _DEBUG
 
 	default:
-		break;
+		break;                                                       
 	}
 
 	return TRUE;
@@ -3133,7 +3133,7 @@ void	MainWindow::AutoHuntIdle()
 			// 직접 클릭하고 랜덤 스킬을 실행한다.
 			g_pcsAgcmTargeting->TargetCID( nTargetCID , TRUE );
 
-			if (GetTickCount() - m_ulAutoHuntCycle >= 100) {
+			if (GetTickCount() - m_ulAutoHuntCycle >= 250) {
 				m_ulAutoHuntCycle = GetTickCount();
 
 				switch(m_ulAutoHuntIndex){
@@ -3175,7 +3175,7 @@ void	MainWindow::AutoHuntIdle()
 						break;
 					case 9:
 						g_pcsAgcmUIMain->CBQuickBeltUse_10(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-						m_ulAutoHuntIndex++;
+						m_ulAutoHuntIndex = 0;
 						break;
 					case 10:
 						g_pcsAgcmUIMain->CBQuickBeltLayerUp(g_pcsAgcmUIMain, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
