@@ -1,6 +1,7 @@
 #include "AgsmCashMall.h"
 #include "AgsmSystemMessage.h"
 #include "AgsmBillingChina.h"
+#include "AgppBillInfo.h"
 
 AgsmCashMall::AgsmCashMall()
 {
@@ -170,13 +171,19 @@ BOOL AgsmCashMall::CBRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData)
 	// request to billing server
 	
 	CashInfoGlobal pCash;
-	pThis->m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
 	printf("Increasing from %f to %f\n", pCash.m_WCoin, 2500.0);
 	pThis->m_pcsAgpmBillInfo->SetCashGlobal(pcsCharacter, 2500.0, 0);
+	/*pThis->m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
+	
 
 	pThis->m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
-	printf("Now %f\n", pCash.m_WCoin);
+	printf("Now %f\n", pCash.m_WCoin);*/
 
+	
+	pThis->m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
+
+	PACKET_BILLINGINFO_CASHINFO pPacket(pcsCharacter->m_lID, pCash.m_WCoin, pCash.m_PCoin);
+	pThis->SendPacketUser(pPacket, pThis->m_pcsAgsmCharacter->GetCharDPNID(pcsCharacter));
 
 	return TRUE;
 }
