@@ -3123,14 +3123,14 @@ BOOL AgpmSkill::SetSkillType(AgpdSkillTemplate *pcsSkillTemplate, CHAR *szTypeNa
 		if (bProcessInterval)
 			pcsSkillTemplate->m_lProcessIntervalEffectType[nIndex] |= AGPMSKILL_EFFECT_DISPEL_MAGIC;
 
-		switch(lValue)
+		/*switch(lValue)
 		{
 		case 2:
 			pcsSkillTemplate->m_lEffectType[nIndex] |= AGPMSKILL_EFFECT_DISPEL_MAGIC_CURE;
 			if (bProcessInterval)
 				pcsSkillTemplate->m_lProcessIntervalEffectType[nIndex] |= AGPMSKILL_EFFECT_DISPEL_MAGIC_CURE;
 			break;
-		}
+		}*/
 
 		// 2007.06.05. steeple
 		// dispel 이 확장되었다.

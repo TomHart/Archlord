@@ -732,6 +732,25 @@ BOOL AgsmAdmin::ParseCommand(AgpdChatData * pstChatData, BOOL bCheckAdmin)
 
 		return ProcessCommandCreate(pcsAgpdCharacter, pstChatData->szMessage + j, pstChatData->lMessageLength - (j), 99);
 	}
+	else if(strncmp(pstChatData->szMessage + i, "/createstack", k - i) == 0)
+	{
+		if(!pcsAgpdCharacter 
+			|| (!m_pagpmAdmin->IsAdminCharacter(pcsAgpdCharacter) || m_pagpmAdmin->GetAdminLevel(pcsAgpdCharacter) < AGPMADMIN_LEVEL_3)
+			&& !CheckAdminTypeSpecial(pcsAgpdCharacter, pstChatData->szMessage + i, k-1))
+			return FALSE;
+
+		INT32 lCount = 1;
+
+		INT32 lTID = atoi(pstChatData->szMessage + j);
+
+		AgpdItemTemplate* pItemTemplate = m_pagpmItem->GetItemTemplate(lTID);
+		if (pItemTemplate)
+		{
+			lCount = pItemTemplate->m_lMaxStackableCount;
+		}
+
+		return ProcessCommandCreate(pcsAgpdCharacter, pstChatData->szMessage + j, pstChatData->lMessageLength - (j), lCount);
+	}
 	//else if (strncmp(pstChatData->szMessage + i, "/createcash", k - i) == 0)
 	//{
 	//	if(!m_pagpmAdmin->IsAdminCharacter(pcsAgpdCharacter))
@@ -3050,7 +3069,7 @@ BOOL AgsmAdmin::ProcessCommandNoticeClear(AgpdCharacter* pcsAgpdCharacter, CHAR*
 // 초대박 임시 땜빵 급조 코드. 2004.02.02
 BOOL AgsmAdmin::ProcessCommandCreate(AgpdCharacter* pcsAgpdCharacter, CHAR* szMessage, INT32 lMessageLength, INT32 lCount)
 {
-	if(!m_pagpmItem || !m_pagsmItemManager || lCount < 1 || lCount > 99)
+	if(!m_pagpmItem || !m_pagsmItemManager || lCount < 1 || lCount > 9999)
 		return FALSE;
 
 	if(!pcsAgpdCharacter || !szMessage || lMessageLength <= 0 || lMessageLength >= 32)
@@ -3069,7 +3088,7 @@ BOOL AgsmAdmin::ProcessCommandCreate(AgpdCharacter* pcsAgpdCharacter, CHAR* szMe
 	strtok_s(szBuf, "_", &pszPhysicalConvert);
 	
 	CHAR* pszSocket = NULL;
-	strtok_s(szBuf, "-", &pszSocket);
+	strtok_s(pszPhysicalConvert, "-", &pszSocket);
 
 	// Item Template ID
 	INT32 lTID = atoi(szBuf);

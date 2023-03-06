@@ -1,5 +1,6 @@
 /.vs/
 /Bin/
+/Projects/*/x64/
 /Projects/*/Debug/
 /Projects/*/Debug(Profile)/
 /Projects/*/Release/
@@ -14,7 +15,6 @@
 /Tools/*/Release_GM/
 /Release/
 /Debug/
-Release Global
 Release Japanese DLL
 *.vcxproj.user
 *.vcproj.TOM-PC.tomha.user
