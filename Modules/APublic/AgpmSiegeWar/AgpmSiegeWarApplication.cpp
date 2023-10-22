@@ -28,13 +28,13 @@ BOOL AgpmSiegeWar::CheckGuildRequirement(AgpdGuild *pcsGuild)
 	*/
 
 	// 길드 인원 20인 이상.
-	if (m_pcsAgpmGuild->GetAllMemberCount(pcsGuild) < AGPMSIEGEWAR_GUILD_MEMBER_COUNT_REQUIREMENT)
-		return FALSE;
+	//if (m_pcsAgpmGuild->GetAllMemberCount(pcsGuild) < AGPMSIEGEWAR_GUILD_MEMBER_COUNT_REQUIREMENT)
+	//	return FALSE;
 	
 	//길드 생성 후 14일 이상
-	UINT32	ulCurrentTime	= AuTimeStamp::GetCurrentTimeStamp();
-	if (ulCurrentTime - pcsGuild->m_lCreationDate < AGPMSIEGEWAR_GUILD_CREATE_TIME_REQUIREMENT)
-		return FALSE;
+	/*UINT32	ulCurrentTime	= autimestamp::getcurrenttimestamp();
+	if (ulcurrenttime - pcsguild->m_lcreationdate < agpmsiegewar_guild_create_time_requirement)
+		return false;*/
 
 	return TRUE;
 }
