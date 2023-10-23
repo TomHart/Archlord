@@ -582,7 +582,7 @@ BOOL AgcmUICashMall::RefreshCashEdit()
 #ifdef _AREA_GLOBAL_
 	CashInfoGlobal pCash;
 
-	// m_pagpmBillInfo->SetCashGlobal(m_pcsAgcmCharacter->GetSelfCharacter(), 100000, 100000);
+	m_pagpmBillInfo->SetCashGlobal(m_pcsAgcmCharacter->GetSelfCharacter(), 100000, 100000);
 	m_pagpmBillInfo->GetCashGlobal(m_pcsAgcmCharacter->GetSelfCharacter(), pCash.m_WCoin, pCash.m_PCoin);
 
 	szBuffer.Format("%s : %d", m_pcsAgcmUIManager2->GetUIMessage(AGCMUIMESSAGE_CASHMALL_C_CASH), (INT64)pCash.m_WCoin);
@@ -732,9 +732,9 @@ BOOL AgcmUICashMall::CBBuyProductConfirm(PVOID pClass, PVOID pData1, PVOID pData
 	pThis->m_pcsAgcmUIManager2->RefreshUserData(pThis->m_pcsUserDataBuyProduct, TRUE);
 
 	if (pThis->m_pcsBuyItem){
-		pThis->m_pcsAgcmUIManager2->ThrowEvent(pThis->m_lEventBuyProductConfirm);
+		//pThis->m_pcsAgcmUIManager2->ThrowEvent(pThis->m_lEventBuyProductConfirm);
 
-		/*CashInfoGlobal pCash;
+		CashInfoGlobal pCash;
 		INT64	llCash = 0;
 
 		pThis->m_pagpmBillInfo->GetCashGlobal(pThis->m_pcsAgcmCharacter->GetSelfCharacter(), pCash.m_WCoin, pCash.m_PCoin);
@@ -751,7 +751,7 @@ BOOL AgcmUICashMall::CBBuyProductConfirm(PVOID pClass, PVOID pData1, PVOID pData
 			return FALSE;
 		}
 
-		pThis->m_pcsAgcmUIManager2->GetFunction("CashMallBuyProduct")->m_fnCallback( pClass, pData1, pData2, pData3, pData4, pData5, pcsTarget, pcsSourceControl);*/
+		pThis->m_pcsAgcmUIManager2->GetFunction("CashMallBuyProduct")->m_fnCallback( pClass, pData1, pData2, pData3, pData4, pData5, pcsTarget, pcsSourceControl);
 	}
 
 	return TRUE;
