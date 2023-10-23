@@ -115,7 +115,7 @@ BOOL AgsmCashMall::CBEnterGame(PVOID pData, PVOID pClass, PVOID pCustData)
 	if (!pcsCharacter || pcsCharacter->m_szID[0] == 0)
 		return FALSE;
 	
-	return TRUE;
+	return pThis->CBRefreshCash(pData, pClass, pCustData);
 }
 
 BOOL AgsmCashMall::CBRequestMallProductList(PVOID pData, PVOID pClass, PVOID pCustData)
@@ -421,6 +421,21 @@ BOOL AgsmCashMall::ProcessBuyItem(AgpdCharacter *pcsCharacter, INT32 lProductID,
 		{
 			pcsItem->m_lStatusFlag |= AGPMITEM_STATUS_CASH_PPCARD;
 		}
+
+		// Deduct credits
+		CashInfoGlobal pCash;
+		m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
+		switch (lType) {
+			case AGPMCASHMALL_TYPE_WCOIN:
+				pCash.m_WCoin  = pCash.m_WCoin - pCashItemInfo->m_llPrice;
+				break;
+			case AGPMCASHMALL_TYPE_WCOIN_PPCARD:
+				pCash.m_PCoin  = pCash.m_PCoin - pCashItemInfo->m_llPrice;
+				break;
+		}
+		m_pcsAgpmBillInfo->SetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
+		PACKET_BILLINGINFO_CASHINFO pPacket(pcsCharacter->m_lID, pCash.m_WCoin, pCash.m_PCoin);
+		SendPacketUser(pPacket, m_pcsAgsmCharacter->GetCharDPNID(pcsCharacter));
 
 		// insert item into cash inventory
 		if (!m_pcsAgpmItem->AddItemToCashInventory(pcsCharacter, pcsItem))

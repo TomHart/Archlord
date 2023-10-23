@@ -18,6 +18,7 @@ Last Update: 2002. 08. 23
 #include "ApmMap.h"
 #include "AgpmFactors.h"
 #include "AgpmCharacter.h"
+#include "AgpmCashMall.h"
 #include "AgpdCharacter.h"
 #include "AgpmItem.h"
 #include "AgpmEventBinding.h"
