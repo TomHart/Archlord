@@ -171,16 +171,13 @@ BOOL AgsmCashMall::CBRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData)
 	// request to billing server
 	
 	CashInfoGlobal pCash;
-	printf("Increasing from %f to %f\n", pCash.m_WCoin, 2500.0);
-	pThis->m_pcsAgpmBillInfo->SetCashGlobal(pcsCharacter, 2500.0, 0);
-	/*pThis->m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
-	
+	pThis->m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
+	printf("Increasing w from %f to %f\n", pCash.m_WCoin, pCash.m_WCoin + 5000.0);
+	printf("Increasing p from %f to %f\n", pCash.m_WCoin, pCash.m_PCoin + 5000.0);
+	pThis->m_pcsAgpmBillInfo->SetCashGlobal(pcsCharacter, pCash.m_WCoin + 5000.0, pCash.m_PCoin + 5000.0);
 
 	pThis->m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
-	printf("Now %f\n", pCash.m_WCoin);*/
-
-	
-	pThis->m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
+	printf("Now %f and %f\n", pCash.m_WCoin, pCash.m_PCoin);
 
 	PACKET_BILLINGINFO_CASHINFO pPacket(pcsCharacter->m_lID, pCash.m_WCoin, pCash.m_PCoin);
 	pThis->SendPacketUser(pPacket, pThis->m_pcsAgsmCharacter->GetCharDPNID(pcsCharacter));
@@ -298,7 +295,7 @@ INT32 AgsmCashMall::CheckBuyRequirement(AgpdCharacter *pcsCharacter, INT32 lProd
 		return AGPMCASH_BUY_RESULT_NOT_ENOUGH_CASH;
 	}
 #else
-	/*CashInfoGlobal pCash;
+	CashInfoGlobal pCash;
 	m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
 
 	switch(lType)
@@ -318,7 +315,7 @@ INT32 AgsmCashMall::CheckBuyRequirement(AgpdCharacter *pcsCharacter, INT32 lProd
 			} break;
 		default:
 			return AGPMCASH_BUY_RESULT_FAIL;
-	}*/
+	}
 #endif
 
 	if (!m_pcsAgpmItem->IsAnyEmptyCashInventory(pcsCharacter))

@@ -181,13 +181,11 @@ BOOL AgpmBillInfo::IsPCBang(AgpdCharacter *pcsCharacter)
 BOOL AgpmBillInfo::SetCashGlobal(AgpdCharacter* pcsCharacter, double WCoin, double PCoin)
 {
 	if (!pcsCharacter){
-		printf("SetCashGlobal 1");
 		return FALSE;
 	}
 
 	AgpdBillInfo	*pcsAttachData	= GetADCharacter(pcsCharacter);
 	if(!pcsAttachData){
-		printf("SetCashGlobal 2");
 		return FALSE;
 	}
 

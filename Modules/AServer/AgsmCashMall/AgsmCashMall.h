@@ -5,6 +5,7 @@
 #include "AgsmItemManager.h"
 #include "AgsmCharManager.h"
 #include "AgsmBilling.h"
+#include "AgppBillInfo.h"
 
 class AgsmSystemMessage;
 class CCallBackFunc;
