@@ -3330,6 +3330,10 @@ BOOL	AgcmUIOption::LoadFromINI(char*	szFile)
 				{
 					csStream.GetValue(&m_bAutolootOwn);
 				}
+				else if(!strcmp(szValueName, "REF_AL"))
+				{
+					csStream.GetValue(&m_bIsAutoPickItem);
+				}
 				else if(!strcmp(szValueName, "REF_PIN"))
 				{
 					csStream.GetValue(&m_bRefusePartyIn);
@@ -3494,6 +3498,7 @@ BOOL	AgcmUIOption::SaveToINI(char*		szFileName)
 	if(!csStream.WriteValue("REF_TRADE", m_bRefuseTrade))		return FALSE;
 	if(!csStream.WriteValue("REF_DXP", m_bDisableXP))			return FALSE;
 	if(!csStream.WriteValue("REF_ALOWN", m_bAutolootOwn))		return FALSE;
+	if(!csStream.WriteValue("REF_AL", m_bIsAutoPickItem))		return FALSE;
 	if(!csStream.WriteValue("REF_PIN", m_bRefusePartyIn))		return FALSE;
 	if(!csStream.WriteValue("REF_GIN", m_bRefuseGuildIn))		return FALSE;
 	if(!csStream.WriteValue("REF_GBAT", m_bRefuseGuildBattle))	return FALSE;
@@ -3849,8 +3854,9 @@ VOID AgcmUIOption::SendOptionFlag()
 	if (m_bRefuseGuildIn)		lOptionFlag = m_pcsAgpmCharacter->SetOptionFlag(lOptionFlag, AGPDCHAR_OPTION_REFUSE_GUILD_IN);
 	if (m_bRefuseGuildRelation)	lOptionFlag = m_pcsAgpmCharacter->SetOptionFlag(lOptionFlag, AGPDCHAR_OPTION_REFUSE_GUILD_RELATION);
 	if (m_bRefuseBuddy)			lOptionFlag = m_pcsAgpmCharacter->SetOptionFlag(lOptionFlag, AGPDCHAR_OPTION_REFUSE_BUDDY);
+	if (m_bIsAutoPickItem)		lOptionFlag = m_pcsAgpmCharacter->SetOptionFlag(lOptionFlag, AGPDCHAR_OPTION_AUTO_PICKUP_ONOFF);
 	if (m_bDisableXP)			lOptionFlag = m_pcsAgpmCharacter->SetOptionFlag(lOptionFlag, AGPDCHAR_OPTION_DISABLE_XP);
-	if (m_bAutolootOwn)			lOptionFlag = m_pcsAgpmCharacter->SetOptionFlag(lOptionFlag, AGPDCHAR_OPTION_AUTO_PICKUP_ONOFF);
+	if (m_bAutolootOwn)			lOptionFlag = m_pcsAgpmCharacter->SetOptionFlag(lOptionFlag, AGPDCHAR_OPTION_AUTO_PICKUP_OWN_ONLY);
 
 	m_pcsAgcmCharacter->SendPacketOptionFlag(pcsSelfCharacter, lOptionFlag);
 }

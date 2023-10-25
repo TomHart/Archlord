@@ -359,7 +359,7 @@ BOOL AgsmDropItem2::CBDropItem(PVOID pData, PVOID pClass, PVOID pCustData)
 			return TRUE;
 	}
 	
-	BOOL autolootOwn = ((AgpmCharacter *) pcsDropInfo->m_pcsFirstLooter)->IsOptionFlag(((AgpdCharacter *) pcsDropInfo->m_pcsFirstLooter), AGPDCHAR_OPTION_AUTO_PICKUP_OWN_ONLY) == TRUE;
+	BOOL autolootOwnConfig = ((AgpmCharacter *) pcsDropInfo->m_pcsFirstLooter)->IsOptionFlag(((AgpdCharacter *) pcsDropInfo->m_pcsFirstLooter), AGPDCHAR_OPTION_AUTO_PICKUP_OWN_ONLY) == TRUE;
 
 	INT32 lCharClass = pThis->m_pcsAgpmFactors->GetClass(&((AgpdCharacter *) pcsDropInfo->m_pcsFirstLooter)->m_csFactor);
 	INT32 lCharRace = pThis->m_pcsAgpmFactors->GetRace(&((AgpdCharacter *) pcsDropInfo->m_pcsFirstLooter)->m_csFactor);
@@ -369,14 +369,22 @@ BOOL AgsmDropItem2::CBDropItem(PVOID pData, PVOID pClass, PVOID pCustData)
 		pThis->m_pcsAgsmCharacter->IsAutoPickup((AgpdCharacter *) pcsDropInfo->m_pcsFirstLooter) &&
 		pcsItem->m_pcsItemTemplate->m_lID != 4608)
 	{
-		if (
-			autolootOwn && 
-			!(
-				pThis->m_pcsAgpmFactors->CheckClass((AuCharClassType)lCharClass, &pcsItem->m_csRestrictFactor) && 
-				pThis->m_pcsAgpmFactors->CheckRace ((AuRaceType)     lCharRace,  &pcsItem->m_csRestrictFactor) && 
-				pThis->m_pcsAgpmFactors->GetClass (&pcsItem->m_csRestrictFactor) != AUCHARCLASS_TYPE_NONE
-			)
-		) {
+		printf(
+			"Dropping %s. Class %d, Race: %d, Rank: %d\n", 
+			pcsItem->m_pcsItemTemplate->m_szName,
+			pThis->m_pcsAgpmFactors->GetClass (&pcsItem->m_csRestrictFactor),
+			pThis->m_pcsAgpmFactors->GetRace (&pcsItem->m_csRestrictFactor),
+			pcsADItemTemplate->m_lDropRank
+		);
+		
+		BOOL notForMe = !(
+			pThis->m_pcsAgpmFactors->CheckClass((AuCharClassType)lCharClass, &pcsItem->m_csRestrictFactor) && 
+			pThis->m_pcsAgpmFactors->CheckRace ((AuRaceType)     lCharRace,  &pcsItem->m_csRestrictFactor)
+		);
+
+		BOOL classless = pThis->m_pcsAgpmFactors->GetClass (&pcsItem->m_csRestrictFactor) == AUCHARCLASS_TYPE_NONE;
+
+		if (autolootOwnConfig && notForMe && !classless) {
 			return pThis->DropItemToField(pcsDropInfo->m_pcsDropCharacter, pcsDropInfo->m_pcsFirstLooter, pcsItem);
 		}
 

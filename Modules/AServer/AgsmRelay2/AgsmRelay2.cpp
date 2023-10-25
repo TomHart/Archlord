@@ -718,6 +718,10 @@ BOOL AgsmRelay2::OnReceive(UINT32 ulType, PVOID pvPacket, INT16 nSize, UINT32 ul
 			OnParamServerMove((PACKET_HEADER*)pvPacket, ulNID);
 			break;
 
+		case AGSMRELAY_PARAM_REQUEST_CASH:
+			OnParamRequestCash(nParam, pvPacketEmb, ulNID);
+			break;
+
 		default:
 			OutputDebugString("!!! Error : Unknown Packet Received in AgsmRelay2::OnReceive()\n");
 			break;

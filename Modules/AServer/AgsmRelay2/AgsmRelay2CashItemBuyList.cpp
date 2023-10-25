@@ -34,6 +34,31 @@ void AgsmRelay2::InitPacketCashItemBuyList()
 
 	}
 
+void AgsmRelay2::InitPacketRequestCash()
+	{
+	m_csPacketCashItemBuyList.SetFlagLength(sizeof(INT16));
+	m_csPacketCashItemBuyList.SetFieldType(AUTYPE_INT16,			1,		// eAgsmRelay2Operation
+										   AUTYPE_CHAR,				AGSMACCOUNT_MAX_ACCOUNT_NAME + 1,
+										   AUTYPE_END,				0
+										   );
+
+	}
+
+BOOL AgsmRelay2::OnParamRequestCash(INT16 nParam, PVOID pvPacket, UINT32 ulNID)
+	{
+	AgsdRelay2RequestCash *pAgsdRelay2 = new AgsdRelay2RequestCash;
+
+	CHAR	*pszAccountID = NULL;
+
+	m_csPacketCashItemBuyList.GetField(FALSE, pvPacket, 0,
+								&pAgsdRelay2->m_eOperation,
+								&pszAccountID
+								);
+
+	printf("%s : %s", __FUNCTION__, pszAccountID);
+		
+	return TRUE;
+	}
 
 BOOL AgsmRelay2::OnParamCashItemBuyList(INT16 nParam, PVOID pvPacket, UINT32 ulNID)
 	{
@@ -335,3 +360,34 @@ void AgsdRelay2CashItemBuyList::Dump(CHAR *pszOp)
 	}
 
 
+/********************************************************************/
+/*		The Implementation of AgsdRelay2RequestCash class		*/
+/********************************************************************/
+//
+AgsdRelay2RequestCash::AgsdRelay2RequestCash()
+	{
+	ZeroMemory(m_szAccountID, sizeof(m_szAccountID));
+	}
+
+
+BOOL AgsdRelay2RequestCash::SetParamUpdate(AuStatement* pStatement)
+	{
+	INT16 i=0;
+
+	return TRUE;
+	}
+
+
+BOOL AgsdRelay2RequestCash::SetParamInsert(AuStatement *pStatement)
+	{
+	INT16 i=0;
+	
+	pStatement->SetParam(i++, m_szAccountID, sizeof(m_szAccountID));
+	
+	return TRUE;	
+	}
+
+
+void AgsdRelay2RequestCash::Dump(CHAR *pszOp)
+	{
+	}

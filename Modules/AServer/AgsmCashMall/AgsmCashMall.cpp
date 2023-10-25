@@ -168,7 +168,8 @@ BOOL AgsmCashMall::CBRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData)
 
 	pcsAttachData->m_ulLastRefreshCashTimeMsec	= pThis->GetClockCount() + AGPMCASHMALL_MIN_INTERVAL_REFRESH_CASH;
 
-	// request to billing server
+	// Request to billing server.
+	// EnumCallback(AGSMITEM_CB_USE_ITEM_REVERSE_ORB, pcsItem->m_pcsCharacter, pcsItem);
 	
 	CashInfoGlobal pCash;
 	pThis->m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);

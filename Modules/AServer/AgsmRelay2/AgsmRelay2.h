@@ -214,6 +214,7 @@ class AgsmRelay2 : public AgsModule
 		AuPacket m_csPacketMailItem;
 		AuPacket m_csPacketRowset;
 		AuPacket m_csPacketCashItemBuyList;
+		AuPacket m_csPacketRequestCash;
 		AuPacket m_csPacketWantedCriminal;
 		AuPacket m_csPacketCastle;
 		AuPacket m_csPacketSiege;
@@ -242,6 +243,7 @@ class AgsmRelay2 : public AgsModule
 		void	InitPacketBuddy();
 		void	InitPacketMail();
 		void	InitPacketCashItemBuyList();
+		void	InitPacketRequestCash();
 		void	InitPacketWantedCriminal();
 		void	InitPacketSiegeWar();
 		void	InitPacketGuildItem();
@@ -279,6 +281,7 @@ class AgsmRelay2 : public AgsModule
 		BOOL	OnParamMail(INT16 nParam, PVOID pvPacket, UINT32 ulNID);
 		BOOL	OnParamMailItem(INT16 nParam, PVOID pvPacket, UINT32 ulNID);
 		BOOL	OnParamCashItemBuyList(INT16 nParam, PVOID pvPacket, UINT32 ulNID);
+		BOOL	OnParamRequestCash(INT16 nParam, PVOID pvPacket, UINT32 ulNID);
 		BOOL	OnParamWantedCriminal(INT16 nParam, PVOID pvPacket, UINT32 ulNID);
 		BOOL	OnParamNotifySaveAll(INT16 nParam, PVOID pvPacket, UINT32 ulNID);
 		BOOL	OnParamCastle(INT16 nParam, PVOID pvPacket, UINT32 ulNID);
