@@ -13,6 +13,7 @@
 #include "AgsmServerManager2.h"
 #include "AgpmFactors.h"
 #include "AgpmCharacter.h"
+#include "AgpdCharacter.h"
 #include "AgsmCharacter.h"
 #include "AgpmItem.h"
 #include "AgsmItem.h"
@@ -33,6 +34,7 @@
 #include "AgsmAdmin.h"
 #include "AgsmAuctionRelay.h"
 #include "AgsmCashMall.h"
+#include "AgpmCashMall.h"
 #include "AuCircularBuffer.h"
 #include "AgsmReturnToLogin.h"
 #include "AgsmWantedCriminal.h"
@@ -176,6 +178,7 @@ class AgsmRelay2 : public AgsModule
 		AgpmMailBox				*m_pAgpmMailBox;
 		AgsmMailBox				*m_pAgsmMailBox;
 		AgsmCashMall			*m_pAgsmCashMall;
+		AgpmCashMall			*m_pAgpmCashMall;
 		AgsmReturnToLogin		*m_pAgsmReturnToLogin;
 		AgsmWantedCriminal		*m_pAgsmWantedCriminal;
 		AgsmSiegeWar			*m_pAgsmSiegeWar;
@@ -508,6 +511,7 @@ class AgsmRelay2 : public AgsModule
 		static BOOL CBAdminItemConvertUpdate2(PVOID pData, PVOID pClass, PVOID pCustData);
 		static BOOL CBAdminItemUpdate(PVOID pData, PVOID pClass, PVOID pCustData);
 		static BOOL CBAdminSkillUpdate(PVOID pData, PVOID pClass, PVOID pCustData);
+		static BOOL CBRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData);
 
 		//	Operation result callback (game-side after execution callback)
 		static BOOL	CBOperationResultGuildMaster(PVOID pData, PVOID pClass, PVOID pCustData);

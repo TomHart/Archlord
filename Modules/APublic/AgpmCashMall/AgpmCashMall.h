@@ -183,6 +183,7 @@ private:
 
 public:
 	AuPacket			m_csPacket;
+	AuPacket			m_csPacketRequestCash;
 
 public:
 	AgpmCashMall();

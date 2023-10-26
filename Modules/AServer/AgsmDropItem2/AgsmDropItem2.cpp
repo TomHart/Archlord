@@ -369,13 +369,13 @@ BOOL AgsmDropItem2::CBDropItem(PVOID pData, PVOID pClass, PVOID pCustData)
 		pThis->m_pcsAgsmCharacter->IsAutoPickup((AgpdCharacter *) pcsDropInfo->m_pcsFirstLooter) &&
 		pcsItem->m_pcsItemTemplate->m_lID != 4608)
 	{
-		printf(
+		/*printf(
 			"Dropping %s. Class %d, Race: %d, Rank: %d\n", 
 			pcsItem->m_pcsItemTemplate->m_szName,
 			pThis->m_pcsAgpmFactors->GetClass (&pcsItem->m_csRestrictFactor),
 			pThis->m_pcsAgpmFactors->GetRace (&pcsItem->m_csRestrictFactor),
 			pcsADItemTemplate->m_lDropRank
-		);
+		);*/
 		
 		BOOL notForMe = !(
 			pThis->m_pcsAgpmFactors->CheckClass((AuCharClassType)lCharClass, &pcsItem->m_csRestrictFactor) && 

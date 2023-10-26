@@ -76,6 +76,7 @@ AgsmRelay2::AgsmRelay2()
 	InitPacketBuddy();
 	InitPacketMail();
 	InitPacketCashItemBuyList();
+	InitPacketRequestCash();
 	InitPacketWantedCriminal();
 	InitPacketSiegeWar();
 	InitPacketGuildItem();
@@ -162,6 +163,7 @@ BOOL AgsmRelay2::OnAddModule()
 	m_pAgpmMailBox			= (AgpmMailBox *) GetModule(_T("AgpmMailBox"));
 	m_pAgsmMailBox			= (AgsmMailBox *) GetModule(_T("AgsmMailBox"));
 	m_pAgsmCashMall			= (AgsmCashMall *) GetModule(_T("AgsmCashMall"));
+	m_pAgpmCashMall			= (AgpmCashMall *) GetModule(_T("AgpmCashMall"));
 	m_pAgsmReturnToLogin	= (AgsmReturnToLogin *) GetModule(_T("AgsmReturnToLogin"));
 	m_pAgsmWantedCriminal	= (AgsmWantedCriminal *) GetModule(_T("AgsmWantedCriminal"));
 	m_pAgsmSiegeWar			= (AgsmSiegeWar *) GetModule(_T("AgsmSiegeWar"));
@@ -421,6 +423,12 @@ BOOL AgsmRelay2::OnAddModule()
 	if (m_pAgsmCashMall)
 		{
 		
+		}
+
+	if (m_pAgpmCashMall)
+		{
+			if (!m_pAgpmCashMall->SetCallbackRefreshCash(CBRefreshCash, this))
+				return FALSE;
 		}
 
 	if (m_pAgsmWantedCriminal)
@@ -1180,6 +1188,39 @@ BOOL AgsmRelay2::EnableBufferingSend()
 
 
 
+BOOL AgsmRelay2::CBRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData)
+{
+	if (!pClass || !pData)
+		return FALSE;
+
+ 	AgsmRelay2	*pThis			= (AgsmRelay2 *)  pClass;
+	AgpdCharacter *pcsCharacter = (AgpdCharacter *) pData;
+
+	printf("%s for %s\n", __FUNCTION__, &pcsCharacter->m_szID);
+	INT16 nPacketLength	= 0;
+	INT16 nOperation = AGSMDATABASE_OPERATION_SELECT;
+	PVOID pvPacketPingSend = pThis->m_csPacketRequestCash.MakePacket(TRUE, &nPacketLength, 0, &pcsCharacter->m_szID);
+	if (!pvPacketPingSend)
+		return FALSE;
+
+	
+	CHAR	*pszAccountID = NULL;
+
+	pThis->m_csPacketRequestCash.GetField(FALSE, pvPacketPingSend, 0, &pszAccountID);
+	printf("Got back %s\n", pszAccountID);
+	pThis->m_csPacketRequestCash.GetField(TRUE, pvPacketPingSend, 0, &pszAccountID);
+	printf("Got back %s\n", pszAccountID);
+
+	pThis->m_csPacketRequestCash.GetField(FALSE, pvPacketPingSend, nPacketLength, &pszAccountID);
+	printf("Got back %s\n", pszAccountID);
+	pThis->m_csPacketRequestCash.GetField(TRUE, pvPacketPingSend, nPacketLength, &pszAccountID);
+	printf("Got back %s\n", pszAccountID);
+
+	BOOL bResult = pThis->MakeAndSendRelayPacket(pvPacketPingSend, AGSMRELAY_PARAM_REQUEST_CASH);
+	pThis->m_csPacketRequestCash.FreePacket(pvPacketPingSend);
+	
+	return bResult;
+}
 
 //
 //===================================

@@ -36,9 +36,8 @@ void AgsmRelay2::InitPacketCashItemBuyList()
 
 void AgsmRelay2::InitPacketRequestCash()
 	{
-	m_csPacketCashItemBuyList.SetFlagLength(sizeof(INT16));
-	m_csPacketCashItemBuyList.SetFieldType(AUTYPE_INT16,			1,		// eAgsmRelay2Operation
-										   AUTYPE_CHAR,				AGSMACCOUNT_MAX_ACCOUNT_NAME + 1,
+		m_csPacketRequestCash.SetFlagLength(sizeof(INT16));
+		m_csPacketRequestCash.SetFieldType(AUTYPE_CHAR,	AGPACHARACTER_MAX_ID_STRING + 1,	// Game ID
 										   AUTYPE_END,				0
 										   );
 
@@ -50,12 +49,17 @@ BOOL AgsmRelay2::OnParamRequestCash(INT16 nParam, PVOID pvPacket, UINT32 ulNID)
 
 	CHAR	*pszAccountID = NULL;
 
-	m_csPacketCashItemBuyList.GetField(FALSE, pvPacket, 0,
-								&pAgsdRelay2->m_eOperation,
-								&pszAccountID
-								);
+	m_csPacketRequestCash.GetField(TRUE, pvPacket, 0, &pszAccountID);
 
-	printf("%s : %s", __FUNCTION__, pszAccountID);
+	printf("%s : %s\n", __FUNCTION__, pszAccountID);
+
+	m_csPacketRequestCash.GetField(TRUE, pvPacket, 65, &pszAccountID);
+
+	printf("%s : %s\n", __FUNCTION__, pszAccountID);
+
+	m_csPacketRequestCash.GetField(TRUE, pvPacket, 256, &pszAccountID);
+
+	printf("%s : %s\n", __FUNCTION__, pszAccountID);
 		
 	return TRUE;
 	}

@@ -170,7 +170,24 @@ BOOL AgsmCashMall::CBRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData)
 
 	// Request to billing server.
 	// EnumCallback(AGSMITEM_CB_USE_ITEM_REVERSE_ORB, pcsItem->m_pcsCharacter, pcsItem);
+
+	INT8 cOperation = AGPMCASH_OPERATION_REFRESH_CASH;
+	INT16 nPacketLength = 0;
+	PVOID pvPacket = pThis->m_pcsAgpmCashMall->m_csPacketRequestCash.MakePacket(
+		TRUE, 
+		&nPacketLength, 
+		AGPMCASHMALL_PACKET_TYPE,
+		&cOperation,
+		&pcsCharacter->m_lID
+	);
+
+	BOOL bResult = pThis->SendPacket(pvPacket, nPacketLength, pThis->_GetCharacterNID(pcsCharacter));
+	pThis->m_pcsAgpmCashMall->m_csPacketRequestCash.FreePacket(pvPacket);
 	
+
+
+
+
 	CashInfoGlobal pCash;
 	pThis->m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
 	printf("Increasing w from %f to %f\n", pCash.m_WCoin, pCash.m_WCoin + 5000.0);
@@ -185,6 +202,22 @@ BOOL AgsmCashMall::CBRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData)
 
 	return TRUE;
 }
+
+//	Helper
+//===============================================
+//
+UINT32 AgsmCashMall::_GetCharacterNID(INT32 lCID)
+	{
+	ASSERT(NULL != m_pAgsmCharacter);
+	return m_pcsAgsmCharacter->GetCharDPNID(lCID);
+	}
+
+
+UINT32 AgsmCashMall::_GetCharacterNID(AgpdCharacter *pAgpdCharacter)
+	{
+	ASSERT(NULL != m_pAgsmCharacter);
+	return m_pcsAgsmCharacter->GetCharDPNID(pAgpdCharacter);
+	}
 
 BOOL AgsmCashMall::CBCheckListVersion(PVOID pData, PVOID pClass, PVOID pCustData)
 {

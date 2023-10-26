@@ -709,7 +709,7 @@ enum ePacketType
 	AGSMRELAY_PACKET_TYPE							= 0x25,
 	AGSMITEMLOG_PACKET_TYPE							= 0x26,
 	AGSMLOG_PACKET_TYPE								= 0x27,
-	AGSMGUILD_PACKET_TYPE							= 0x28,
+	AGSMGUILD_PACKET_TYPE							= 0x28
 };
 
 // const variable definition

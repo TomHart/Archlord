@@ -51,4 +51,9 @@ private:
 	BOOL	ProcessBuyItem(AgpdCharacter *pcsCharacter, INT32 lProductID, UINT8 ucMallListVersion, INT32 lType);
 	BOOL	ProcessBuyItemResult(AgpdCharacter *pcsCharacter, AgsdBillingItem *pcsBilling);
 	BOOL	SendMallProductList(AgpdCharacter *pcsCharacter, INT32 lTab);
+
+protected:
+	//	Helper
+	UINT32	_GetCharacterNID(INT32 lCID);
+	UINT32	_GetCharacterNID(AgpdCharacter *pAgpdCharacter);
 };

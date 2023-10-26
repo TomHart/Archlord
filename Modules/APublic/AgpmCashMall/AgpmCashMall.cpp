@@ -24,6 +24,13 @@ AgpmCashMall::AgpmCashMall()
 							AUTYPE_END,		0
 							);
 
+	m_csPacketRequestCash.SetFlagLength(sizeof(INT64));
+	m_csPacketRequestCash.SetFieldType(
+							AUTYPE_INT8,	1,		// operation
+							AUTYPE_CHAR,	AGPACHARACTER_MAX_ID_STRING + 1,	// Game ID
+							AUTYPE_END,		0
+							);
+
 	m_lIndexAttachData	= 0;
 
 	m_bUseCashMall		= TRUE;
