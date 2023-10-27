@@ -961,6 +961,11 @@ BOOL AgsmRelay2::SetCallbackLordGuard(ApModuleDefaultCallBack pfCallback, PVOID 
 	return SetCallback(AGSMRELAY_PARAM_LORDGUARD, pfCallback, pClass);
 	}
 
+BOOL AgsmRelay2::SetCallbackRefreshCash(ApModuleDefaultCallBack pfCallback, PVOID pClass)
+	{
+	return SetCallback(AGSMRELAY_PARAM_REQUEST_CASH, pfCallback, pClass);
+	}
+
 
 
 
@@ -1318,6 +1323,7 @@ BOOL AgsmRelay2::SetCallbackOperation()
 		|| !SetCallbackSiegeApplication(CBOperationSiegeApplication, this)
 		|| !SetCallbackSiegeObject(CBOperationSiegeObject, this)
 		|| !SetCallbackTax(CBOperation, this)
+		|| !SetCallbackRefreshCash(CBOperationRefreshCash, this)
 		//#############################
 		//|| !SetCallbackArchlord(CBOperationArchlord, this)
 		//|| !SetCallbackLordGuard(CBOperationLordGuard, this)

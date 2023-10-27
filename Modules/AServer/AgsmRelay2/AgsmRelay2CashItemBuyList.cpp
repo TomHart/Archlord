@@ -43,25 +43,114 @@ void AgsmRelay2::InitPacketRequestCash()
 
 	}
 
+	/*AgsdQueryWithParam* pQuery = new AgsdQueryWithParam;
+	pQuery->m_nIndex = 522;
+	pQuery->m_pParam = pAgsdRelay2;
+	pQuery->SetCallback(AgsmRelay2::CBFinishOperationRefreshCash,
+						AgsmRelay2::CBFailOperation,
+						this, pAgsdRelay2);
+
+	return m_pAgsmDatabasePool->Execute(pQuery);*/
+
+
+
+
+	/*CashInfoGlobal pCash;
+	m_pAgpm
+	pThis->m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
+	printf("Increasing w from %f to %f\n", pCash.m_WCoin, pCash.m_WCoin + 5000.0);
+	printf("Increasing p from %f to %f\n", pCash.m_WCoin, pCash.m_PCoin + 5000.0);
+	pThis->m_pcsAgpmBillInfo->SetCashGlobal(pcsCharacter, pCash.m_WCoin + 5000.0, pCash.m_PCoin + 5000.0);
+
+	pThis->m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
+	printf("Now %f and %f\n", pCash.m_WCoin, pCash.m_PCoin);
+
+	PACKET_BILLINGINFO_CASHINFO pPacket(pcsCharacter->m_lID, pCash.m_WCoin, pCash.m_PCoin);
+	pThis->SendPacketUser(pPacket, pThis->m_pcsAgsmCharacter->GetCharDPNID(pcsCharacter));*/
+
 BOOL AgsmRelay2::OnParamRequestCash(INT16 nParam, PVOID pvPacket, UINT32 ulNID)
 	{
 	AgsdRelay2RequestCash *pAgsdRelay2 = new AgsdRelay2RequestCash;
 
 	CHAR	*pszAccountID = NULL;
 
-	m_csPacketRequestCash.GetField(TRUE, pvPacket, 0, &pszAccountID);
-
-	printf("%s : %s\n", __FUNCTION__, pszAccountID);
-
-	m_csPacketRequestCash.GetField(TRUE, pvPacket, 65, &pszAccountID);
-
-	printf("%s : %s\n", __FUNCTION__, pszAccountID);
-
 	m_csPacketRequestCash.GetField(TRUE, pvPacket, 256, &pszAccountID);
 
-	printf("%s : %s\n", __FUNCTION__, pszAccountID);
-		
+	// printf("%s : %s\n", __FUNCTION__, pszAccountID);
+
+
+	pAgsdRelay2->m_ulNID = ulNID;
+	_tcscpy(pAgsdRelay2->m_szAccountID, pszAccountID ? pszAccountID : _T(""));
+
+	return EnumCallback(AGSMRELAY_PARAM_REQUEST_CASH, (PVOID)pAgsdRelay2, (PVOID)nParam);
+	}
+
+BOOL AgsmRelay2::CBOperationRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData)
+	{
+	AgsmRelay2 *pThis = (AgsmRelay2 *) pClass;
+	AgsdRelay2RequestCash *pAgsdRelay2 = (AgsdRelay2RequestCash *) pData;
+	// INT16 nParam = (INT16) pCustData;
+
+	// pAgsdRelay2->m_nParam = nParam;
+
+	AgsdQueryWithParam* pQuery = new AgsdQueryWithParam;
+	pAgsdRelay2->m_eOperation = AGSMDATABASE_OPERATION_SELECT;
+	pQuery->m_nIndex = 522;
+	pQuery->m_pParam = pAgsdRelay2;
+	pQuery->SetCallback(AgsmRelay2::CBFinishOperationRefreshCash,
+						AgsmRelay2::CBFailOperation,
+						pThis, pAgsdRelay2);
+
+	return pThis->m_pAgsmDatabasePool->Execute(pQuery);
+	}
+
+
+BOOL AgsmRelay2::CBFinishOperationRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData)
+	{
+	if (!pClass || !pCustData)
+		return FALSE;
+
+	AgsmRelay2 *pThis = (AgsmRelay2 *) pClass;
+	AgsdDBParam *pAgsdRelay2 = (AgsdDBParam *) pCustData;
+	AuRowset *pRowset = (AuRowset *) pData;
+
+	if (NULL != pRowset && AGSMDATABASE_OPERATION_SELECT == pAgsdRelay2->m_eOperation)
+		pThis->OnSelectResultRefreshCash(pRowset, pAgsdRelay2);
+
+	pAgsdRelay2->Release();
+
 	return TRUE;
+	}
+
+BOOL AgsmRelay2::OnSelectResultRefreshCash(AuRowset *pRowset, AgsdDBParam *pAgsdRelay2)
+	{
+	AgsdRelay2Mail *pAgsdRelay2Mail = static_cast<AgsdRelay2Mail *>(pAgsdRelay2);
+
+	AgsdServer *pGameServer = m_pAgsmServerManager->GetGameServerBySocketIndex(pAgsdRelay2Mail->m_ulNID);
+	if (!pGameServer)
+		return FALSE;
+
+	// Rowset을 Custom parameter로 맹글고 이걸 Embedded Packet으로 맹근다.
+	INT32 lTotalSize = pRowset->GetRowBufferSize() * pRowset->GetRowCount();
+	INT32 lTotalStep = 1 + (INT32) (lTotalSize / 20000);
+	pAgsdRelay2Mail->m_nStatus = (INT16) lTotalStep;
+	INT32 lRowsPerStep = 20000 / pRowset->GetRowBufferSize();
+	for (INT32 lStep = 0; lStep < lTotalStep; lStep++)
+		{
+		PVOID pvPacket = NULL;
+		pAgsdRelay2Mail->m_pvPacketEmb = MakeRowsetPacket2(pRowset, lStep, lRowsPerStep);
+
+		BOOL bResult = SendMail(pAgsdRelay2Mail, pGameServer->m_dpnidServer);
+
+		printf("\nMail of CID[%d] sended[%d/%d][%s]\n", pAgsdRelay2Mail->m_lCID,
+										lStep + 1, lTotalStep,  bResult ? _T("TRUE") : _T("FALSE"));
+		}
+
+	// last
+	pAgsdRelay2Mail->m_pvPacketEmb = NULL;
+	pAgsdRelay2Mail->m_lResult = AGPMMAILBOX_RESULT_SUCCESS;
+
+	return SendMail(pAgsdRelay2Mail, pGameServer->m_dpnidServer);
 	}
 
 BOOL AgsmRelay2::OnParamCashItemBuyList(INT16 nParam, PVOID pvPacket, UINT32 ulNID)
@@ -374,6 +463,15 @@ AgsdRelay2RequestCash::AgsdRelay2RequestCash()
 	}
 
 
+BOOL AgsdRelay2RequestCash::SetParamSelect(AuStatement* pStatement)
+	{
+	INT16 i=0;
+
+	pStatement->SetParam(i++, m_szAccountID, sizeof(m_szAccountID));
+	
+	return TRUE;
+	}
+
 BOOL AgsdRelay2RequestCash::SetParamUpdate(AuStatement* pStatement)
 	{
 	INT16 i=0;
@@ -389,6 +487,15 @@ BOOL AgsdRelay2RequestCash::SetParamInsert(AuStatement *pStatement)
 	pStatement->SetParam(i++, m_szAccountID, sizeof(m_szAccountID));
 	
 	return TRUE;	
+	}
+
+BOOL AgsdRelay2RequestCash::SetParamExecute(AuStatement *pStatement)
+	{
+	INT16 i=0;
+	
+	pStatement->SetParam(i++, m_szAccountID, sizeof(m_szAccountID));
+	
+	return TRUE;
 	}
 
 

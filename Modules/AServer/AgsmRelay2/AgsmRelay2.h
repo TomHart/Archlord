@@ -332,6 +332,7 @@ class AgsmRelay2 : public AgsModule
 		static BOOL	CBOperationSiegeObject(PVOID pData, PVOID pClass, PVOID pCustData);
 		static BOOL	CBOperationArchlord(PVOID pData, PVOID pClass, PVOID pCustData);
 		static BOOL	CBOperationLordGuard(PVOID pData, PVOID pClass, PVOID pCustData);
+		static BOOL	CBOperationRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData);
 
 		//	Finish operation callback (relay-side after execution callback)
 		static BOOL	CBFinishOperation(PVOID pData, PVOID pClass, PVOID pCustData);
@@ -352,6 +353,7 @@ class AgsmRelay2 : public AgsModule
 		static BOOL	CBFinishOperationSiegeObject(PVOID pData, PVOID pClass, PVOID pCustData);
 		static BOOL	CBFinishOperationArchlord(PVOID pData, PVOID pClass, PVOID pCustData);
 		static BOOL	CBFinishOperationLordGuard(PVOID pData, PVOID pClass, PVOID pCustData);
+		static BOOL CBFinishOperationRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData);
 
 		//	Select result (relay-side select query result processing)
 		BOOL	OnSelectResult(AuRowset *pRowset, AgsdDBParam *pAgsdRelay);
@@ -372,6 +374,7 @@ class AgsmRelay2 : public AgsModule
 		BOOL	OnSelectResultSiegeObject(AuRowset *pRowset, AgsdDBParam *pAgsdRelay2);
 		BOOL	OnSelectResultArchlord(AuRowset *pRowset, AgsdDBParam *pAgsdRelay2);
 		BOOL	OnSelectResultLordGuard(AuRowset *pRowset, AgsdDBParam *pAgsdRelay2);
+		BOOL	OnSelectResultRefreshCash(AuRowset *pRowset, AgsdDBParam *pAgsdRelay2);
 
 		//	Callback Setting (relay side operation callback setting)
 		BOOL	SetCallbackCustom(ApModuleDefaultCallBack pfCallback, PVOID pClass);
@@ -413,6 +416,7 @@ class AgsmRelay2 : public AgsModule
 		BOOL	SetCallbackTax(ApModuleDefaultCallBack pfCallback, PVOID pClass);
 		BOOL	SetCallbackArchlord(ApModuleDefaultCallBack pfCallback, PVOID pClass);
 		BOOL	SetCallbackLordGuard(ApModuleDefaultCallBack pfCallback, PVOID pClass);
+		BOOL	SetCallbackRefreshCash(ApModuleDefaultCallBack pfCallback, PVOID pClass);
 
 		//	Callback (Game server side callbacks)
 		static BOOL CBCustom(PVOID pData, PVOID pClass, PVOID pCustData);
