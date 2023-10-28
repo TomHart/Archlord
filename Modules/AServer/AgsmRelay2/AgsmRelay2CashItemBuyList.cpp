@@ -38,6 +38,7 @@ void AgsmRelay2::InitPacketRequestCash()
 	{
 		m_csPacketRequestCash.SetFlagLength(sizeof(INT16));
 		m_csPacketRequestCash.SetFieldType(AUTYPE_CHAR,	AGPACHARACTER_MAX_ID_STRING + 1,	// Game ID
+										   AUTYPE_INT32,			1,		// CID
 										   AUTYPE_END,				0
 										   );
 
@@ -68,19 +69,33 @@ void AgsmRelay2::InitPacketRequestCash()
 	PACKET_BILLINGINFO_CASHINFO pPacket(pcsCharacter->m_lID, pCash.m_WCoin, pCash.m_PCoin);
 	pThis->SendPacketUser(pPacket, pThis->m_pcsAgsmCharacter->GetCharDPNID(pcsCharacter));*/
 
-BOOL AgsmRelay2::OnParamRequestCash(INT16 nParam, PVOID pvPacket, UINT32 ulNID)
-	{
+BOOL AgsmRelay2::OnParamRequestCash(INT16 nParam, PVOID pvPacket, UINT32 ulNID, PACKET_HEADER* pvOuterPacket)
+{
+
+	PACKET_AGSP_REFRESH_CASH_RELAY *pPacketRaw = (PACKET_AGSP_REFRESH_CASH_RELAY*) pvOuterPacket;
+
+	if (NULL != pPacketRaw && pPacketRaw->nOperation == AGPMCASH_PACKET_OPERATION_REFRESH_CASH) {
+		// Don't need the CID?
+		printf("Send coins (%d) back to user '%s' (%d)\n", pPacketRaw->nCoins, pPacketRaw->strCharName, pPacketRaw->nCID);
+		AgpdCharacter *pcsCharacter = m_pAgpmCharacter->GetCharacter(pPacketRaw->strCharName);
+		m_pAgpmBillInfo->SetCashGlobal(pcsCharacter, pPacketRaw->nCoins, pPacketRaw->nCoins);
+		PACKET_BILLINGINFO_CASHINFO pPacket(pcsCharacter->m_lID, pPacketRaw->nCoins, pPacketRaw->nCoins);
+		SendPacketUser(pPacket, m_pAgsmCharacter->GetCharDPNID(pcsCharacter));
+		return TRUE;
+	}
+
 	AgsdRelay2RequestCash *pAgsdRelay2 = new AgsdRelay2RequestCash;
 
-	CHAR	*pszAccountID = NULL;
+	CHAR *pszAccountID = NULL;
+	INT32 pszCID = 0;
 
-	m_csPacketRequestCash.GetField(TRUE, pvPacket, 256, &pszAccountID);
+	m_csPacketRequestCash.GetField(TRUE, pvPacket, 256, &pszAccountID, &pszCID);
 
-	// printf("%s : %s\n", __FUNCTION__, pszAccountID);
-
+	printf("%s: %s %d\n", __FUNCTION__, pszAccountID, pszCID);
 
 	pAgsdRelay2->m_ulNID = ulNID;
-	_tcscpy(pAgsdRelay2->m_szAccountID, pszAccountID ? pszAccountID : _T(""));
+	_tcscpy(pAgsdRelay2->m_szAccountID, NULL != pszAccountID ? pszAccountID : _T(""));
+	pAgsdRelay2->m_lCID = pszCID;
 
 	return EnumCallback(AGSMRELAY_PARAM_REQUEST_CASH, (PVOID)pAgsdRelay2, (PVOID)nParam);
 	}
@@ -95,7 +110,7 @@ BOOL AgsmRelay2::CBOperationRefreshCash(PVOID pData, PVOID pClass, PVOID pCustDa
 
 	AgsdQueryWithParam* pQuery = new AgsdQueryWithParam;
 	pAgsdRelay2->m_eOperation = AGSMDATABASE_OPERATION_SELECT;
-	pQuery->m_nIndex = 522;
+	pQuery->m_nIndex = 1027;
 	pQuery->m_pParam = pAgsdRelay2;
 	pQuery->SetCallback(AgsmRelay2::CBFinishOperationRefreshCash,
 						AgsmRelay2::CBFailOperation,
@@ -111,7 +126,8 @@ BOOL AgsmRelay2::CBFinishOperationRefreshCash(PVOID pData, PVOID pClass, PVOID p
 		return FALSE;
 
 	AgsmRelay2 *pThis = (AgsmRelay2 *) pClass;
-	AgsdDBParam *pAgsdRelay2 = (AgsdDBParam *) pCustData;
+	AgsdDBParam *pAgsdRelay2 = NULL;
+	pAgsdRelay2 = (AgsdDBParam *) pCustData;
 	AuRowset *pRowset = (AuRowset *) pData;
 
 	if (NULL != pRowset && AGSMDATABASE_OPERATION_SELECT == pAgsdRelay2->m_eOperation)
@@ -124,34 +140,63 @@ BOOL AgsmRelay2::CBFinishOperationRefreshCash(PVOID pData, PVOID pClass, PVOID p
 
 BOOL AgsmRelay2::OnSelectResultRefreshCash(AuRowset *pRowset, AgsdDBParam *pAgsdRelay2)
 	{
-	AgsdRelay2Mail *pAgsdRelay2Mail = static_cast<AgsdRelay2Mail *>(pAgsdRelay2);
+	AgsdRelay2RequestCash *pAgsdRelay2Mail = static_cast<AgsdRelay2RequestCash *>(pAgsdRelay2);
 
 	AgsdServer *pGameServer = m_pAgsmServerManager->GetGameServerBySocketIndex(pAgsdRelay2Mail->m_ulNID);
 	if (!pGameServer)
 		return FALSE;
 
-	// Rowset을 Custom parameter로 맹글고 이걸 Embedded Packet으로 맹근다.
 	INT32 lTotalSize = pRowset->GetRowBufferSize() * pRowset->GetRowCount();
 	INT32 lTotalStep = 1 + (INT32) (lTotalSize / 20000);
-	pAgsdRelay2Mail->m_nStatus = (INT16) lTotalStep;
 	INT32 lRowsPerStep = 20000 / pRowset->GetRowBufferSize();
-	for (INT32 lStep = 0; lStep < lTotalStep; lStep++)
+	for (INT32 lStep2 = 0; lStep2 < lTotalStep; lStep2++)
 		{
-		PVOID pvPacket = NULL;
-		pAgsdRelay2Mail->m_pvPacketEmb = MakeRowsetPacket2(pRowset, lStep, lRowsPerStep);
 
-		BOOL bResult = SendMail(pAgsdRelay2Mail, pGameServer->m_dpnidServer);
+		UINT32 ulCol = 0;
+		
+		CHAR *psz = NULL;
 
-		printf("\nMail of CID[%d] sended[%d/%d][%s]\n", pAgsdRelay2Mail->m_lCID,
-										lStep + 1, lTotalStep,  bResult ? _T("TRUE") : _T("FALSE"));
+		//if (NULL != (psz = pRowset->Get(ul, ulCol++)))	// item tid
+		//	lItemTID = _ttoi(psz);
+
+		CHAR *charName = NULL;
+		INT32 coins = 0;
+		INT32 CID = 0;
+
+		
+		if (NULL != (psz = (CHAR *) pRowset->Get(lStep2, ulCol++))) {
+			charName = psz;
 		}
 
-	// last
-	pAgsdRelay2Mail->m_pvPacketEmb = NULL;
-	pAgsdRelay2Mail->m_lResult = AGPMMAILBOX_RESULT_SUCCESS;
+		if (NULL != (psz = (CHAR *) pRowset->Get(lStep2, ulCol++))) {
+			coins = _ttoi(psz);
+		}
 
-	return SendMail(pAgsdRelay2Mail, pGameServer->m_dpnidServer);
+		//if (NULL != (psz = (CHAR *) pRowset->Get(lStep2, ulCol++))) {
+		//	CID = _ttoi(psz);
+		//}
+
+		printf("Got '%s' and '%d'. CID %d\n", charName, coins, pAgsdRelay2Mail->m_lCID);
+
+		PACKET_AGSP_REFRESH_CASH_RESULT_RELAY pPacket(charName, coins, pAgsdRelay2Mail->m_lCID);
+
+		AgsEngine::GetInstance()->SendPacket(pPacket, pAgsdRelay2Mail->m_ulNID);
+		break;
 	}
+
+	return TRUE;
+	}
+
+
+//PACKET_AGSMCHARACTER_RELAY_CHANGENAME_RESULT pPacket;
+//pPacket.CID = pAgsdRelay2->CID;
+//pPacket.NID = pAgsdRelay2->NID;
+//pPacket.EID = pAgsdRelay2->EID;
+//pPacket.STEP = pAgsdRelay2->STEP;
+//pPacket.nResult = pAgsdRelay2->m_nCode;
+//
+//AgsEngine::GetInstance()->SendPacket(pPacket, pAgsdRelay2->m_ulNID);
+
 
 BOOL AgsmRelay2::OnParamCashItemBuyList(INT16 nParam, PVOID pvPacket, UINT32 ulNID)
 	{
@@ -467,6 +512,7 @@ BOOL AgsdRelay2RequestCash::SetParamSelect(AuStatement* pStatement)
 	{
 	INT16 i=0;
 
+	// pStatement->SetParam(i++, &m_lCID);
 	pStatement->SetParam(i++, m_szAccountID, sizeof(m_szAccountID));
 	
 	return TRUE;

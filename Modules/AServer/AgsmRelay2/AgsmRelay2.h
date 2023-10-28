@@ -142,6 +142,40 @@ class Relay2Sender : public zzThread
 class AgsmEventSystem;
 class AgsmItemManager;
 
+
+typedef enum AgpmCashMallPacketOperation {
+	AGPMCASH_PACKET_OPERATION_REFRESH_CASH	= 0,
+} AgpmCashMallPacketOperation;
+
+struct PACKET_AGSP_REFRESH_CASH_RELAY : public PACKET_HEADER
+{
+	CHAR FlagLow;
+	INT16 nParam;
+	INT16 nOperation;
+	CHAR strCharName[AGPACHARACTER_MAX_ID_STRING+1];
+	INT32 nCID;
+	INT32 nCoins;
+
+	PACKET_AGSP_REFRESH_CASH_RELAY()
+		:nOperation(0), FlagLow(1)
+	{
+		cType			= AGSMRELAY_PACKET_TYPE;
+		nParam			= AGSMRELAY_PARAM_REQUEST_CASH;
+		unPacketLength	= (UINT16)sizeof(PACKET_AGSP_REFRESH_CASH_RELAY);
+	}
+};
+struct PACKET_AGSP_REFRESH_CASH_RESULT_RELAY : public PACKET_AGSP_REFRESH_CASH_RELAY
+{
+	PACKET_AGSP_REFRESH_CASH_RESULT_RELAY(CHAR *CharName, INT32 Coins, INT32 CID)
+	{
+		nOperation = AGPMCASH_PACKET_OPERATION_REFRESH_CASH;
+		unPacketLength	= (UINT16)sizeof(PACKET_AGSP_REFRESH_CASH_RELAY);
+		strncpy(strCharName, CharName, AGPACHARACTER_MAX_ID_STRING);
+		nCoins = Coins;
+		nCID = CID;
+	}
+};
+
 /************************************************/
 /*		The Definition of AgsmRelay2 class		*/
 /************************************************/
@@ -156,6 +190,7 @@ class AgsmRelay2 : public AgsModule
 		AgsmServerManager2		*m_pAgsmServerManager2;
 		AgpmCharacter			*m_pAgpmCharacter;
 		AgsmCharacter			*m_pAgsmCharacter;
+		AgpmBillInfo			*m_pAgpmBillInfo;
 		AgpmItem				*m_pAgpmItem;
 		AgsmItem				*m_pAgsmItem;
 		AgsmItemConvert			*m_pAgsmItemConvert;
@@ -284,7 +319,7 @@ class AgsmRelay2 : public AgsModule
 		BOOL	OnParamMail(INT16 nParam, PVOID pvPacket, UINT32 ulNID);
 		BOOL	OnParamMailItem(INT16 nParam, PVOID pvPacket, UINT32 ulNID);
 		BOOL	OnParamCashItemBuyList(INT16 nParam, PVOID pvPacket, UINT32 ulNID);
-		BOOL	OnParamRequestCash(INT16 nParam, PVOID pvPacket, UINT32 ulNID);
+		BOOL	OnParamRequestCash(INT16 nParam, PVOID pvPacket, UINT32 ulNID, PACKET_HEADER* pvOuterPacket);
 		BOOL	OnParamWantedCriminal(INT16 nParam, PVOID pvPacket, UINT32 ulNID);
 		BOOL	OnParamNotifySaveAll(INT16 nParam, PVOID pvPacket, UINT32 ulNID);
 		BOOL	OnParamCastle(INT16 nParam, PVOID pvPacket, UINT32 ulNID);

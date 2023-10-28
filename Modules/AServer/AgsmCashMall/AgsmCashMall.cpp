@@ -173,11 +173,15 @@ BOOL AgsmCashMall::CBRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData)
 
 	INT8 cOperation = AGPMCASH_OPERATION_REFRESH_CASH;
 	INT16 nPacketLength = 0;
+	INT32 lID = 0;
+	lID = pcsCharacter->m_lID;
+	printf("Making packet for '%s' (%d)\n", pcsCharacter->m_szID, pcsCharacter->m_lID);
 	PVOID pvPacket = pThis->m_pcsAgpmCashMall->m_csPacketRequestCash.MakePacket(
 		TRUE, 
 		&nPacketLength, 
 		AGPMCASHMALL_PACKET_TYPE,
-		&cOperation,
+		&cOperation, // Remove the m_csPacketRequestCash definition WITHOUT operation first
+		&pcsCharacter->m_szID,
 		&pcsCharacter->m_lID
 	);
 

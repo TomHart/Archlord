@@ -137,6 +137,7 @@ BOOL AgsmRelay2::OnAddModule()
   #endif
 	
 	// get related modules
+	m_pAgpmBillInfo			= (AgpmBillInfo *) GetModule(_T("AgpmBillInfo"));
 	m_pAgpmConfig			= (AgpmConfig *) GetModule(_T("AgpmConfig"));
 	m_pAgpmCharacter		= (AgpmCharacter *) GetModule(_T("AgpmCharacter"));
 	m_pAgsmCharacter		= (AgsmCharacter *) GetModule(_T("AgsmCharacter"));
@@ -727,7 +728,7 @@ BOOL AgsmRelay2::OnReceive(UINT32 ulType, PVOID pvPacket, INT16 nSize, UINT32 ul
 			break;
 
 		case AGSMRELAY_PARAM_REQUEST_CASH:
-			OnParamRequestCash(nParam, pvPacketEmb, ulNID);
+			OnParamRequestCash(nParam, pvPacketEmb, ulNID, (PACKET_HEADER*)pvPacket);
 			break;
 
 		default:
@@ -1201,25 +1202,16 @@ BOOL AgsmRelay2::CBRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData)
  	AgsmRelay2	*pThis			= (AgsmRelay2 *)  pClass;
 	AgpdCharacter *pcsCharacter = (AgpdCharacter *) pData;
 
-	printf("%s for %s\n", __FUNCTION__, &pcsCharacter->m_szID);
 	INT16 nPacketLength	= 0;
 	INT16 nOperation = AGSMDATABASE_OPERATION_SELECT;
-	PVOID pvPacketPingSend = pThis->m_csPacketRequestCash.MakePacket(TRUE, &nPacketLength, 0, &pcsCharacter->m_szID);
+	PVOID pvPacketPingSend = pThis->m_csPacketRequestCash.MakePacket(TRUE, &nPacketLength, 0, &pcsCharacter->m_szID, &pcsCharacter->m_lID);
 	if (!pvPacketPingSend)
 		return FALSE;
 
 	
 	CHAR	*pszAccountID = NULL;
-
-	pThis->m_csPacketRequestCash.GetField(FALSE, pvPacketPingSend, 0, &pszAccountID);
-	printf("Got back %s\n", pszAccountID);
-	pThis->m_csPacketRequestCash.GetField(TRUE, pvPacketPingSend, 0, &pszAccountID);
-	printf("Got back %s\n", pszAccountID);
-
-	pThis->m_csPacketRequestCash.GetField(FALSE, pvPacketPingSend, nPacketLength, &pszAccountID);
-	printf("Got back %s\n", pszAccountID);
 	pThis->m_csPacketRequestCash.GetField(TRUE, pvPacketPingSend, nPacketLength, &pszAccountID);
-	printf("Got back %s\n", pszAccountID);
+	printf("Got back '%s'\n", pszAccountID);
 
 	BOOL bResult = pThis->MakeAndSendRelayPacket(pvPacketPingSend, AGSMRELAY_PARAM_REQUEST_CASH);
 	pThis->m_csPacketRequestCash.FreePacket(pvPacketPingSend);

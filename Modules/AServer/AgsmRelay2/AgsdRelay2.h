@@ -581,6 +581,7 @@ class AgsdRelay2RequestCash : public AgsdDBParam, public ApMemory<AgsdRelay2Requ
 	{
 	public:
 		CHAR	m_szAccountID[AGSMACCOUNT_MAX_ACCOUNT_NAME + 1];
+		INT32	m_lCID;
 
 	protected:
 		BOOL	SetParamSelect(AuStatement *pStatement);
