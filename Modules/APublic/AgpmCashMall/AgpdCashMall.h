@@ -2,7 +2,7 @@
 
 #include "ApDefine.h"
 
-#define	AGPMCASHMALL_MIN_INTERVAL_REFRESH_CASH		1000
+#define	AGPMCASHMALL_MIN_INTERVAL_REFRESH_CASH		100
 
 typedef struct _AgpdCashMall
 {

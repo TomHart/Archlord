@@ -1,6 +1,7 @@
 #include "AgsmCashMall.h"
 #include "AgsmSystemMessage.h"
 #include "AgsmBillingChina.h"
+#include "AgppBillInfo.h"
 
 AgsmCashMall::AgsmCashMall()
 {
@@ -147,7 +148,6 @@ BOOL AgsmCashMall::CBRequestBuyItem(PVOID pData, PVOID pClass, PVOID pCustData)
 
 BOOL AgsmCashMall::CBRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData)
 {
-	printf("Refreshing cash...\n");
 	if (!pData || !pClass)
 		return FALSE;
 
@@ -156,30 +156,48 @@ BOOL AgsmCashMall::CBRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData)
 
 	AgpdCashMall	*pcsAttachData	= pThis->m_pcsAgpmCashMall->GetADCharacter(pcsCharacter);
 	if (!pcsAttachData){
-		printf("1");
 		return FALSE;
 	}
 
 	if (pcsAttachData->m_ulLastRefreshCashTimeMsec + AGPMCASHMALL_MIN_INTERVAL_REFRESH_CASH > pThis->GetClockCount()){
-		printf("2");
 		return TRUE;
 	}
 
 	pcsAttachData->m_ulLastRefreshCashTimeMsec	= pThis->GetClockCount() + AGPMCASHMALL_MIN_INTERVAL_REFRESH_CASH;
 
-	// request to billing server
+	// Request to billing server.
+	INT8 cOperation = AGPMCASH_OPERATION_REFRESH_CASH;
+	INT16 nPacketLength = 0;
+	PVOID pvPacket = pThis->m_pcsAgpmCashMall->m_csPacketRequestCash.MakePacket(
+		TRUE, 
+		&nPacketLength, 
+		AGPMCASHMALL_PACKET_TYPE,
+		&cOperation,
+		&pcsCharacter->m_szID,
+		&pcsCharacter->m_lID
+	);
+
+	BOOL bResult = pThis->SendPacket(pvPacket, nPacketLength, pThis->_GetCharacterNID(pcsCharacter));
+	pThis->m_pcsAgpmCashMall->m_csPacketRequestCash.FreePacket(pvPacket);
 	
-	CashInfoGlobal pCash;
-	pThis->m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
-	printf("Increasing from %f to %f\n", pCash.m_WCoin, 2500.0);
-	pThis->m_pcsAgpmBillInfo->SetCashGlobal(pcsCharacter, 2500.0, 0);
-
-	pThis->m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
-	printf("Now %f\n", pCash.m_WCoin);
-
-
-	return TRUE;
+	return bResult;
 }
+
+//	Helper
+//===============================================
+//
+UINT32 AgsmCashMall::_GetCharacterNID(INT32 lCID)
+	{
+	ASSERT(NULL != m_pAgsmCharacter);
+	return m_pcsAgsmCharacter->GetCharDPNID(lCID);
+	}
+
+
+UINT32 AgsmCashMall::_GetCharacterNID(AgpdCharacter *pAgpdCharacter)
+	{
+	ASSERT(NULL != m_pAgsmCharacter);
+	return m_pcsAgsmCharacter->GetCharDPNID(pAgpdCharacter);
+	}
 
 BOOL AgsmCashMall::CBCheckListVersion(PVOID pData, PVOID pClass, PVOID pCustData)
 {
@@ -291,7 +309,7 @@ INT32 AgsmCashMall::CheckBuyRequirement(AgpdCharacter *pcsCharacter, INT32 lProd
 		return AGPMCASH_BUY_RESULT_NOT_ENOUGH_CASH;
 	}
 #else
-	/*CashInfoGlobal pCash;
+	CashInfoGlobal pCash;
 	m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
 
 	switch(lType)
@@ -311,7 +329,7 @@ INT32 AgsmCashMall::CheckBuyRequirement(AgpdCharacter *pcsCharacter, INT32 lProd
 			} break;
 		default:
 			return AGPMCASH_BUY_RESULT_FAIL;
-	}*/
+	}
 #endif
 
 	if (!m_pcsAgpmItem->IsAnyEmptyCashInventory(pcsCharacter))
@@ -417,6 +435,23 @@ BOOL AgsmCashMall::ProcessBuyItem(AgpdCharacter *pcsCharacter, INT32 lProductID,
 		{
 			pcsItem->m_lStatusFlag |= AGPMITEM_STATUS_CASH_PPCARD;
 		}
+
+		// Deduct credits
+		CashInfoGlobal pCash;
+		m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
+		switch (lType) {
+			case AGPMCASHMALL_TYPE_WCOIN:
+				pCash.m_WCoin  = pCash.m_WCoin - pCashItemInfo->m_llPrice;
+				break;
+			case AGPMCASHMALL_TYPE_WCOIN_PPCARD:
+				pCash.m_PCoin  = pCash.m_PCoin - pCashItemInfo->m_llPrice;
+				break;
+		}
+
+		// Call refresh instead maybe?
+		m_pcsAgpmBillInfo->SetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
+		PACKET_BILLINGINFO_CASHINFO pPacket(pcsCharacter->m_lID, pCash.m_WCoin, pCash.m_PCoin);
+		SendPacketUser(pPacket, m_pcsAgsmCharacter->GetCharDPNID(pcsCharacter));
 
 		// insert item into cash inventory
 		if (!m_pcsAgpmItem->AddItemToCashInventory(pcsCharacter, pcsItem))

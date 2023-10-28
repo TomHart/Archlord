@@ -136,6 +136,7 @@ BOOL AgsmRelay2::OnAddModule()
   #endif
 	
 	// get related modules
+	m_pAgpmBillInfo			= (AgpmBillInfo *) GetModule(_T("AgpmBillInfo"));
 	m_pAgpmConfig			= (AgpmConfig *) GetModule(_T("AgpmConfig"));
 	m_pAgpmCharacter		= (AgpmCharacter *) GetModule(_T("AgpmCharacter"));
 	m_pAgsmCharacter		= (AgsmCharacter *) GetModule(_T("AgsmCharacter"));
@@ -162,6 +163,7 @@ BOOL AgsmRelay2::OnAddModule()
 	m_pAgpmMailBox			= (AgpmMailBox *) GetModule(_T("AgpmMailBox"));
 	m_pAgsmMailBox			= (AgsmMailBox *) GetModule(_T("AgsmMailBox"));
 	m_pAgsmCashMall			= (AgsmCashMall *) GetModule(_T("AgsmCashMall"));
+	m_pAgpmCashMall			= (AgpmCashMall *) GetModule(_T("AgpmCashMall"));
 	m_pAgsmReturnToLogin	= (AgsmReturnToLogin *) GetModule(_T("AgsmReturnToLogin"));
 	m_pAgsmWantedCriminal	= (AgsmWantedCriminal *) GetModule(_T("AgsmWantedCriminal"));
 	m_pAgsmSiegeWar			= (AgsmSiegeWar *) GetModule(_T("AgsmSiegeWar"));
@@ -421,6 +423,12 @@ BOOL AgsmRelay2::OnAddModule()
 	if (m_pAgsmCashMall)
 		{
 		
+		}
+
+	if (m_pAgpmCashMall)
+		{
+			if (!m_pAgpmCashMall->SetCallbackRefreshCash(CBRefreshCash, this))
+				return FALSE;
 		}
 
 	if (m_pAgsmWantedCriminal)
@@ -718,6 +726,10 @@ BOOL AgsmRelay2::OnReceive(UINT32 ulType, PVOID pvPacket, INT16 nSize, UINT32 ul
 			OnParamServerMove((PACKET_HEADER*)pvPacket, ulNID);
 			break;
 
+		case AGSMRELAY_PARAM_REQUEST_CASH:
+			OnParamRequestCash(nParam, pvPacketEmb, ulNID, (PACKET_HEADER*)pvPacket);
+			break;
+
 		default:
 			OutputDebugString("!!! Error : Unknown Packet Received in AgsmRelay2::OnReceive()\n");
 			break;
@@ -949,6 +961,11 @@ BOOL AgsmRelay2::SetCallbackLordGuard(ApModuleDefaultCallBack pfCallback, PVOID 
 	return SetCallback(AGSMRELAY_PARAM_LORDGUARD, pfCallback, pClass);
 	}
 
+BOOL AgsmRelay2::SetCallbackRefreshCash(ApModuleDefaultCallBack pfCallback, PVOID pClass)
+	{
+	return SetCallback(AGSMRELAY_PARAM_REQUEST_CASH, pfCallback, pClass);
+	}
+
 
 
 
@@ -1176,6 +1193,30 @@ BOOL AgsmRelay2::EnableBufferingSend()
 
 
 
+BOOL AgsmRelay2::CBRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData)
+{
+	if (!pClass || !pData)
+		return FALSE;
+
+ 	AgsmRelay2	*pThis			= (AgsmRelay2 *)  pClass;
+	AgpdCharacter *pcsCharacter = (AgpdCharacter *) pData;
+
+	INT16 nPacketLength	= 0;
+	INT16 nOperation = AGSMDATABASE_OPERATION_SELECT;
+	PVOID pvPacketPingSend = pThis->m_csPacketRequestCash.MakePacket(TRUE, &nPacketLength, 0, &pcsCharacter->m_szID, &pcsCharacter->m_lID);
+	if (!pvPacketPingSend)
+		return FALSE;
+
+	
+	CHAR	*pszAccountID = NULL;
+	pThis->m_csPacketRequestCash.GetField(TRUE, pvPacketPingSend, nPacketLength, &pszAccountID);
+	printf("Got back '%s'\n", pszAccountID);
+
+	BOOL bResult = pThis->MakeAndSendRelayPacket(pvPacketPingSend, AGSMRELAY_PARAM_REQUEST_CASH);
+	pThis->m_csPacketRequestCash.FreePacket(pvPacketPingSend);
+	
+	return bResult;
+}
 
 //
 //===================================
@@ -1273,6 +1314,7 @@ BOOL AgsmRelay2::SetCallbackOperation()
 		|| !SetCallbackSiegeApplication(CBOperationSiegeApplication, this)
 		|| !SetCallbackSiegeObject(CBOperationSiegeObject, this)
 		|| !SetCallbackTax(CBOperation, this)
+		|| !SetCallbackRefreshCash(CBOperationRefreshCash, this)
 		//#############################
 		//|| !SetCallbackArchlord(CBOperationArchlord, this)
 		//|| !SetCallbackLordGuard(CBOperationLordGuard, this)

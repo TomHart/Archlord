@@ -13,6 +13,7 @@
 #include "AgsmServerManager2.h"
 #include "AgpmFactors.h"
 #include "AgpmCharacter.h"
+#include "AgpdCharacter.h"
 #include "AgsmCharacter.h"
 #include "AgpmItem.h"
 #include "AgsmItem.h"
@@ -33,6 +34,7 @@
 #include "AgsmAdmin.h"
 #include "AgsmAuctionRelay.h"
 #include "AgsmCashMall.h"
+#include "AgpmCashMall.h"
 #include "AuCircularBuffer.h"
 #include "AgsmReturnToLogin.h"
 #include "AgsmWantedCriminal.h"
@@ -140,6 +142,38 @@ class Relay2Sender : public zzThread
 class AgsmEventSystem;
 class AgsmItemManager;
 
+
+typedef enum AgpmCashMallPacketOperation {
+	AGPMCASH_PACKET_OPERATION_REFRESH_CASH	= 0,
+} AgpmCashMallPacketOperation;
+
+struct PACKET_AGSP_REFRESH_CASH_RELAY : public PACKET_HEADER
+{
+	CHAR FlagLow;
+	INT16 nParam;
+	INT16 nOperation;
+	CHAR strCharName[AGPACHARACTER_MAX_ID_STRING+1];
+	INT32 nCoins;
+
+	PACKET_AGSP_REFRESH_CASH_RELAY()
+		:nOperation(0), FlagLow(1)
+	{
+		cType			= AGSMRELAY_PACKET_TYPE;
+		nParam			= AGSMRELAY_PARAM_REQUEST_CASH;
+		unPacketLength	= (UINT16)sizeof(PACKET_AGSP_REFRESH_CASH_RELAY);
+	}
+};
+struct PACKET_AGSP_REFRESH_CASH_RESULT_RELAY : public PACKET_AGSP_REFRESH_CASH_RELAY
+{
+	PACKET_AGSP_REFRESH_CASH_RESULT_RELAY(CHAR *CharName, INT32 Coins)
+	{
+		nOperation = AGPMCASH_PACKET_OPERATION_REFRESH_CASH;
+		unPacketLength	= (UINT16)sizeof(PACKET_AGSP_REFRESH_CASH_RELAY);
+		strncpy(strCharName, CharName, AGPACHARACTER_MAX_ID_STRING);
+		nCoins = Coins;
+	}
+};
+
 /************************************************/
 /*		The Definition of AgsmRelay2 class		*/
 /************************************************/
@@ -154,6 +188,7 @@ class AgsmRelay2 : public AgsModule
 		AgsmServerManager2		*m_pAgsmServerManager2;
 		AgpmCharacter			*m_pAgpmCharacter;
 		AgsmCharacter			*m_pAgsmCharacter;
+		AgpmBillInfo			*m_pAgpmBillInfo;
 		AgpmItem				*m_pAgpmItem;
 		AgsmItem				*m_pAgsmItem;
 		AgsmItemConvert			*m_pAgsmItemConvert;
@@ -176,6 +211,7 @@ class AgsmRelay2 : public AgsModule
 		AgpmMailBox				*m_pAgpmMailBox;
 		AgsmMailBox				*m_pAgsmMailBox;
 		AgsmCashMall			*m_pAgsmCashMall;
+		AgpmCashMall			*m_pAgpmCashMall;
 		AgsmReturnToLogin		*m_pAgsmReturnToLogin;
 		AgsmWantedCriminal		*m_pAgsmWantedCriminal;
 		AgsmSiegeWar			*m_pAgsmSiegeWar;
@@ -279,6 +315,7 @@ class AgsmRelay2 : public AgsModule
 		BOOL	OnParamMail(INT16 nParam, PVOID pvPacket, UINT32 ulNID);
 		BOOL	OnParamMailItem(INT16 nParam, PVOID pvPacket, UINT32 ulNID);
 		BOOL	OnParamCashItemBuyList(INT16 nParam, PVOID pvPacket, UINT32 ulNID);
+		BOOL	OnParamRequestCash(INT16 nParam, PVOID pvPacket, UINT32 ulNID, PACKET_HEADER* pvOuterPacket);
 		BOOL	OnParamWantedCriminal(INT16 nParam, PVOID pvPacket, UINT32 ulNID);
 		BOOL	OnParamNotifySaveAll(INT16 nParam, PVOID pvPacket, UINT32 ulNID);
 		BOOL	OnParamCastle(INT16 nParam, PVOID pvPacket, UINT32 ulNID);
@@ -326,6 +363,7 @@ class AgsmRelay2 : public AgsModule
 		static BOOL	CBOperationSiegeObject(PVOID pData, PVOID pClass, PVOID pCustData);
 		static BOOL	CBOperationArchlord(PVOID pData, PVOID pClass, PVOID pCustData);
 		static BOOL	CBOperationLordGuard(PVOID pData, PVOID pClass, PVOID pCustData);
+		static BOOL	CBOperationRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData);
 
 		//	Finish operation callback (relay-side after execution callback)
 		static BOOL	CBFinishOperation(PVOID pData, PVOID pClass, PVOID pCustData);
@@ -346,6 +384,7 @@ class AgsmRelay2 : public AgsModule
 		static BOOL	CBFinishOperationSiegeObject(PVOID pData, PVOID pClass, PVOID pCustData);
 		static BOOL	CBFinishOperationArchlord(PVOID pData, PVOID pClass, PVOID pCustData);
 		static BOOL	CBFinishOperationLordGuard(PVOID pData, PVOID pClass, PVOID pCustData);
+		static BOOL CBFinishOperationRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData);
 
 		//	Select result (relay-side select query result processing)
 		BOOL	OnSelectResult(AuRowset *pRowset, AgsdDBParam *pAgsdRelay);
@@ -366,6 +405,7 @@ class AgsmRelay2 : public AgsModule
 		BOOL	OnSelectResultSiegeObject(AuRowset *pRowset, AgsdDBParam *pAgsdRelay2);
 		BOOL	OnSelectResultArchlord(AuRowset *pRowset, AgsdDBParam *pAgsdRelay2);
 		BOOL	OnSelectResultLordGuard(AuRowset *pRowset, AgsdDBParam *pAgsdRelay2);
+		BOOL	OnSelectResultRefreshCash(AuRowset *pRowset, AgsdDBParam *pAgsdRelay2);
 
 		//	Callback Setting (relay side operation callback setting)
 		BOOL	SetCallbackCustom(ApModuleDefaultCallBack pfCallback, PVOID pClass);
@@ -407,6 +447,7 @@ class AgsmRelay2 : public AgsModule
 		BOOL	SetCallbackTax(ApModuleDefaultCallBack pfCallback, PVOID pClass);
 		BOOL	SetCallbackArchlord(ApModuleDefaultCallBack pfCallback, PVOID pClass);
 		BOOL	SetCallbackLordGuard(ApModuleDefaultCallBack pfCallback, PVOID pClass);
+		BOOL	SetCallbackRefreshCash(ApModuleDefaultCallBack pfCallback, PVOID pClass);
 
 		//	Callback (Game server side callbacks)
 		static BOOL CBCustom(PVOID pData, PVOID pClass, PVOID pCustData);
@@ -505,6 +546,7 @@ class AgsmRelay2 : public AgsModule
 		static BOOL CBAdminItemConvertUpdate2(PVOID pData, PVOID pClass, PVOID pCustData);
 		static BOOL CBAdminItemUpdate(PVOID pData, PVOID pClass, PVOID pCustData);
 		static BOOL CBAdminSkillUpdate(PVOID pData, PVOID pClass, PVOID pCustData);
+		static BOOL CBRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData);
 
 		//	Operation result callback (game-side after execution callback)
 		static BOOL	CBOperationResultGuildMaster(PVOID pData, PVOID pClass, PVOID pCustData);

@@ -34,6 +34,105 @@ void AgsmRelay2::InitPacketCashItemBuyList()
 
 	}
 
+BOOL AgsmRelay2::OnParamRequestCash(INT16 nParam, PVOID pvPacket, UINT32 ulNID, PACKET_HEADER* pvOuterPacket)
+{
+
+	PACKET_AGSP_REFRESH_CASH_RELAY *pPacketRaw = (PACKET_AGSP_REFRESH_CASH_RELAY*) pvOuterPacket;
+
+	if (NULL != pPacketRaw && pPacketRaw->nOperation == AGPMCASH_PACKET_OPERATION_REFRESH_CASH) {
+		printf("Send coins (%d) back to user '%s' (%d)\n", pPacketRaw->nCoins, pPacketRaw->strCharName);
+		AgpdCharacter *pcsCharacter = m_pAgpmCharacter->GetCharacter(pPacketRaw->strCharName);
+		m_pAgpmBillInfo->SetCashGlobal(pcsCharacter, pPacketRaw->nCoins, pPacketRaw->nCoins);
+		PACKET_BILLINGINFO_CASHINFO pPacket(pcsCharacter->m_lID, pPacketRaw->nCoins, pPacketRaw->nCoins);
+		SendPacketUser(pPacket, m_pAgsmCharacter->GetCharDPNID(pcsCharacter));
+		return TRUE;
+	}
+
+	AgsdRelay2RequestCash *pAgsdRelay2 = new AgsdRelay2RequestCash;
+
+	CHAR *pszAccountID = NULL;
+
+	m_csPacketRequestCash.GetField(TRUE, pvPacket, 256, &pszAccountID);
+
+	pAgsdRelay2->m_ulNID = ulNID;
+	_tcscpy(pAgsdRelay2->m_szAccountID, NULL != pszAccountID ? pszAccountID : _T(""));
+
+	return EnumCallback(AGSMRELAY_PARAM_REQUEST_CASH, (PVOID)pAgsdRelay2, (PVOID)nParam);
+	}
+
+BOOL AgsmRelay2::CBOperationRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData)
+	{
+	AgsmRelay2 *pThis = (AgsmRelay2 *) pClass;
+	AgsdRelay2RequestCash *pAgsdRelay2 = (AgsdRelay2RequestCash *) pData;
+
+	AgsdQueryWithParam* pQuery = new AgsdQueryWithParam;
+	pAgsdRelay2->m_eOperation = AGSMDATABASE_OPERATION_SELECT;
+	pQuery->m_nIndex = 1027;
+	pQuery->m_pParam = pAgsdRelay2;
+	pQuery->SetCallback(AgsmRelay2::CBFinishOperationRefreshCash,
+						AgsmRelay2::CBFailOperation,
+						pThis, pAgsdRelay2);
+
+	return pThis->m_pAgsmDatabasePool->Execute(pQuery);
+	}
+
+
+BOOL AgsmRelay2::CBFinishOperationRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData)
+	{
+	if (!pClass || !pCustData)
+		return FALSE;
+
+	AgsmRelay2 *pThis = (AgsmRelay2 *) pClass;
+	AgsdDBParam *pAgsdRelay2 = NULL;
+	pAgsdRelay2 = (AgsdDBParam *) pCustData;
+	AuRowset *pRowset = (AuRowset *) pData;
+
+	if (NULL != pRowset && AGSMDATABASE_OPERATION_SELECT == pAgsdRelay2->m_eOperation)
+		pThis->OnSelectResultRefreshCash(pRowset, pAgsdRelay2);
+
+	pAgsdRelay2->Release();
+
+	return TRUE;
+	}
+
+BOOL AgsmRelay2::OnSelectResultRefreshCash(AuRowset *pRowset, AgsdDBParam *pAgsdRelay2)
+	{
+	AgsdRelay2RequestCash *pAgsdRelay2Mail = static_cast<AgsdRelay2RequestCash *>(pAgsdRelay2);
+
+	AgsdServer *pGameServer = m_pAgsmServerManager->GetGameServerBySocketIndex(pAgsdRelay2Mail->m_ulNID);
+	if (!pGameServer)
+		return FALSE;
+
+	INT32 lTotalSize = pRowset->GetRowBufferSize() * pRowset->GetRowCount();
+	INT32 lTotalStep = 1 + (INT32) (lTotalSize / 20000);
+	INT32 lRowsPerStep = 20000 / pRowset->GetRowBufferSize();
+	for (INT32 lStep2 = 0; lStep2 < lTotalStep; lStep2++)
+		{
+
+		UINT32 ulCol = 0;
+		
+		CHAR *psz = NULL;
+
+		CHAR *charName = NULL;
+		INT32 coins = 0;
+		
+		if (NULL != (psz = (CHAR *) pRowset->Get(lStep2, ulCol++))) {
+			charName = psz;
+		}
+
+		if (NULL != (psz = (CHAR *) pRowset->Get(lStep2, ulCol++))) {
+			coins = _ttoi(psz);
+		}
+
+		PACKET_AGSP_REFRESH_CASH_RESULT_RELAY pPacket(charName, coins, pAgsdRelay2Mail->m_lCID);
+
+		AgsEngine::GetInstance()->SendPacket(pPacket, pAgsdRelay2Mail->m_ulNID);
+		break;
+	}
+
+	return TRUE;
+	}
+
 
 BOOL AgsmRelay2::OnParamCashItemBuyList(INT16 nParam, PVOID pvPacket, UINT32 ulNID)
 	{
@@ -335,3 +434,52 @@ void AgsdRelay2CashItemBuyList::Dump(CHAR *pszOp)
 	}
 
 
+/********************************************************************/
+/*		The Implementation of AgsdRelay2RequestCash class		*/
+/********************************************************************/
+//
+AgsdRelay2RequestCash::AgsdRelay2RequestCash()
+	{
+	ZeroMemory(m_szAccountID, sizeof(m_szAccountID));
+	}
+
+
+BOOL AgsdRelay2RequestCash::SetParamSelect(AuStatement* pStatement)
+	{
+	INT16 i=0;
+
+	pStatement->SetParam(i++, m_szAccountID, sizeof(m_szAccountID));
+	
+	return TRUE;
+	}
+
+BOOL AgsdRelay2RequestCash::SetParamUpdate(AuStatement* pStatement)
+	{
+	INT16 i=0;
+
+	return TRUE;
+	}
+
+
+BOOL AgsdRelay2RequestCash::SetParamInsert(AuStatement *pStatement)
+	{
+	INT16 i=0;
+	
+	pStatement->SetParam(i++, m_szAccountID, sizeof(m_szAccountID));
+	
+	return TRUE;	
+	}
+
+BOOL AgsdRelay2RequestCash::SetParamExecute(AuStatement *pStatement)
+	{
+	INT16 i=0;
+	
+	pStatement->SetParam(i++, m_szAccountID, sizeof(m_szAccountID));
+	
+	return TRUE;
+	}
+
+
+void AgsdRelay2RequestCash::Dump(CHAR *pszOp)
+	{
+	}

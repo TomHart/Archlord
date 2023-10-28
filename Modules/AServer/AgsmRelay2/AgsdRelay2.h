@@ -112,6 +112,7 @@ typedef enum _eAgsmRelay2Param
 	AGSMRELAY_PARAM_COUPON,									// 82. Coupon
 
 	AGSMRELAY_PARAM_SERVERMOVE,								// 83. 특성화 서버 서버이동 //JK_특성화서버
+	AGSMRELAY_PARAM_REQUEST_CASH,							// 84.
 	} eAgsmRelay2Param;
 
 
@@ -572,6 +573,28 @@ class AgsdRelay2CashItemBuyList : public AgsdDBParam, public ApMemory<AgsdRelay2
 		virtual void	Dump(CHAR *pszOp);
 	};
 
+
+//
+//	==========		Cash Item Buy List		==========
+//
+class AgsdRelay2RequestCash : public AgsdDBParam, public ApMemory<AgsdRelay2RequestCash, 20000>
+	{
+	public:
+		CHAR	m_szAccountID[AGSMACCOUNT_MAX_ACCOUNT_NAME + 1];
+
+	protected:
+		BOOL	SetParamSelect(AuStatement *pStatement);
+		BOOL	SetParamUpdate(AuStatement *pStatement);
+		BOOL	SetParamInsert(AuStatement *pStatement);
+		BOOL	SetParamExecute(AuStatement *pStatement);
+	
+	public:
+		AgsdRelay2RequestCash();
+		virtual ~AgsdRelay2RequestCash()	{}
+		virtual void Release()	{ delete this; }
+
+		virtual void	Dump(CHAR *pszOp);
+	};
 
 //
 //	==========		Wanted Criminal		==========
