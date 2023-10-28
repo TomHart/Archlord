@@ -34,49 +34,13 @@ void AgsmRelay2::InitPacketCashItemBuyList()
 
 	}
 
-void AgsmRelay2::InitPacketRequestCash()
-	{
-		m_csPacketRequestCash.SetFlagLength(sizeof(INT16));
-		m_csPacketRequestCash.SetFieldType(AUTYPE_CHAR,	AGPACHARACTER_MAX_ID_STRING + 1,	// Game ID
-										   AUTYPE_INT32,			1,		// CID
-										   AUTYPE_END,				0
-										   );
-
-	}
-
-	/*AgsdQueryWithParam* pQuery = new AgsdQueryWithParam;
-	pQuery->m_nIndex = 522;
-	pQuery->m_pParam = pAgsdRelay2;
-	pQuery->SetCallback(AgsmRelay2::CBFinishOperationRefreshCash,
-						AgsmRelay2::CBFailOperation,
-						this, pAgsdRelay2);
-
-	return m_pAgsmDatabasePool->Execute(pQuery);*/
-
-
-
-
-	/*CashInfoGlobal pCash;
-	m_pAgpm
-	pThis->m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
-	printf("Increasing w from %f to %f\n", pCash.m_WCoin, pCash.m_WCoin + 5000.0);
-	printf("Increasing p from %f to %f\n", pCash.m_WCoin, pCash.m_PCoin + 5000.0);
-	pThis->m_pcsAgpmBillInfo->SetCashGlobal(pcsCharacter, pCash.m_WCoin + 5000.0, pCash.m_PCoin + 5000.0);
-
-	pThis->m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
-	printf("Now %f and %f\n", pCash.m_WCoin, pCash.m_PCoin);
-
-	PACKET_BILLINGINFO_CASHINFO pPacket(pcsCharacter->m_lID, pCash.m_WCoin, pCash.m_PCoin);
-	pThis->SendPacketUser(pPacket, pThis->m_pcsAgsmCharacter->GetCharDPNID(pcsCharacter));*/
-
 BOOL AgsmRelay2::OnParamRequestCash(INT16 nParam, PVOID pvPacket, UINT32 ulNID, PACKET_HEADER* pvOuterPacket)
 {
 
 	PACKET_AGSP_REFRESH_CASH_RELAY *pPacketRaw = (PACKET_AGSP_REFRESH_CASH_RELAY*) pvOuterPacket;
 
 	if (NULL != pPacketRaw && pPacketRaw->nOperation == AGPMCASH_PACKET_OPERATION_REFRESH_CASH) {
-		// Don't need the CID?
-		printf("Send coins (%d) back to user '%s' (%d)\n", pPacketRaw->nCoins, pPacketRaw->strCharName, pPacketRaw->nCID);
+		printf("Send coins (%d) back to user '%s' (%d)\n", pPacketRaw->nCoins, pPacketRaw->strCharName);
 		AgpdCharacter *pcsCharacter = m_pAgpmCharacter->GetCharacter(pPacketRaw->strCharName);
 		m_pAgpmBillInfo->SetCashGlobal(pcsCharacter, pPacketRaw->nCoins, pPacketRaw->nCoins);
 		PACKET_BILLINGINFO_CASHINFO pPacket(pcsCharacter->m_lID, pPacketRaw->nCoins, pPacketRaw->nCoins);
@@ -87,15 +51,11 @@ BOOL AgsmRelay2::OnParamRequestCash(INT16 nParam, PVOID pvPacket, UINT32 ulNID, 
 	AgsdRelay2RequestCash *pAgsdRelay2 = new AgsdRelay2RequestCash;
 
 	CHAR *pszAccountID = NULL;
-	INT32 pszCID = 0;
 
-	m_csPacketRequestCash.GetField(TRUE, pvPacket, 256, &pszAccountID, &pszCID);
-
-	printf("%s: %s %d\n", __FUNCTION__, pszAccountID, pszCID);
+	m_csPacketRequestCash.GetField(TRUE, pvPacket, 256, &pszAccountID);
 
 	pAgsdRelay2->m_ulNID = ulNID;
 	_tcscpy(pAgsdRelay2->m_szAccountID, NULL != pszAccountID ? pszAccountID : _T(""));
-	pAgsdRelay2->m_lCID = pszCID;
 
 	return EnumCallback(AGSMRELAY_PARAM_REQUEST_CASH, (PVOID)pAgsdRelay2, (PVOID)nParam);
 	}
@@ -104,9 +64,6 @@ BOOL AgsmRelay2::CBOperationRefreshCash(PVOID pData, PVOID pClass, PVOID pCustDa
 	{
 	AgsmRelay2 *pThis = (AgsmRelay2 *) pClass;
 	AgsdRelay2RequestCash *pAgsdRelay2 = (AgsdRelay2RequestCash *) pData;
-	// INT16 nParam = (INT16) pCustData;
-
-	// pAgsdRelay2->m_nParam = nParam;
 
 	AgsdQueryWithParam* pQuery = new AgsdQueryWithParam;
 	pAgsdRelay2->m_eOperation = AGSMDATABASE_OPERATION_SELECT;
@@ -156,13 +113,8 @@ BOOL AgsmRelay2::OnSelectResultRefreshCash(AuRowset *pRowset, AgsdDBParam *pAgsd
 		
 		CHAR *psz = NULL;
 
-		//if (NULL != (psz = pRowset->Get(ul, ulCol++)))	// item tid
-		//	lItemTID = _ttoi(psz);
-
 		CHAR *charName = NULL;
 		INT32 coins = 0;
-		INT32 CID = 0;
-
 		
 		if (NULL != (psz = (CHAR *) pRowset->Get(lStep2, ulCol++))) {
 			charName = psz;
@@ -172,12 +124,6 @@ BOOL AgsmRelay2::OnSelectResultRefreshCash(AuRowset *pRowset, AgsdDBParam *pAgsd
 			coins = _ttoi(psz);
 		}
 
-		//if (NULL != (psz = (CHAR *) pRowset->Get(lStep2, ulCol++))) {
-		//	CID = _ttoi(psz);
-		//}
-
-		printf("Got '%s' and '%d'. CID %d\n", charName, coins, pAgsdRelay2Mail->m_lCID);
-
 		PACKET_AGSP_REFRESH_CASH_RESULT_RELAY pPacket(charName, coins, pAgsdRelay2Mail->m_lCID);
 
 		AgsEngine::GetInstance()->SendPacket(pPacket, pAgsdRelay2Mail->m_ulNID);
@@ -186,16 +132,6 @@ BOOL AgsmRelay2::OnSelectResultRefreshCash(AuRowset *pRowset, AgsdDBParam *pAgsd
 
 	return TRUE;
 	}
-
-
-//PACKET_AGSMCHARACTER_RELAY_CHANGENAME_RESULT pPacket;
-//pPacket.CID = pAgsdRelay2->CID;
-//pPacket.NID = pAgsdRelay2->NID;
-//pPacket.EID = pAgsdRelay2->EID;
-//pPacket.STEP = pAgsdRelay2->STEP;
-//pPacket.nResult = pAgsdRelay2->m_nCode;
-//
-//AgsEngine::GetInstance()->SendPacket(pPacket, pAgsdRelay2->m_ulNID);
 
 
 BOOL AgsmRelay2::OnParamCashItemBuyList(INT16 nParam, PVOID pvPacket, UINT32 ulNID)
@@ -512,7 +448,6 @@ BOOL AgsdRelay2RequestCash::SetParamSelect(AuStatement* pStatement)
 	{
 	INT16 i=0;
 
-	// pStatement->SetParam(i++, &m_lCID);
 	pStatement->SetParam(i++, m_szAccountID, sizeof(m_szAccountID));
 	
 	return TRUE;

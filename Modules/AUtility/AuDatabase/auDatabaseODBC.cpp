@@ -395,7 +395,7 @@ BOOL AuStmtODBC::Prepare(LPCTSTR pszQuery)
 
 	ResetParameters();
 	SQLFreeStmt(m_hStatement, SQL_CLOSE);
-	printf("Query=[%s]\n", pszQuery);
+	TRACE("Query=[%s]\n", pszQuery);
 
 	// prepare
 	if (SQL_SUCCESS != SQLPrepare(m_hStatement, (SQLTCHAR *) pszQuery, SQL_NTS))

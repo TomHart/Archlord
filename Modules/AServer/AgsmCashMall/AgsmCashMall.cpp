@@ -115,7 +115,7 @@ BOOL AgsmCashMall::CBEnterGame(PVOID pData, PVOID pClass, PVOID pCustData)
 	if (!pcsCharacter || pcsCharacter->m_szID[0] == 0)
 		return FALSE;
 	
-	return pThis->CBRefreshCash(pData, pClass, pCustData);
+	return TRUE;
 }
 
 BOOL AgsmCashMall::CBRequestMallProductList(PVOID pData, PVOID pClass, PVOID pCustData)
@@ -148,7 +148,6 @@ BOOL AgsmCashMall::CBRequestBuyItem(PVOID pData, PVOID pClass, PVOID pCustData)
 
 BOOL AgsmCashMall::CBRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData)
 {
-	printf("Refreshing cash...\n");
 	if (!pData || !pClass)
 		return FALSE;
 
@@ -157,30 +156,23 @@ BOOL AgsmCashMall::CBRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData)
 
 	AgpdCashMall	*pcsAttachData	= pThis->m_pcsAgpmCashMall->GetADCharacter(pcsCharacter);
 	if (!pcsAttachData){
-		printf("1");
 		return FALSE;
 	}
 
 	if (pcsAttachData->m_ulLastRefreshCashTimeMsec + AGPMCASHMALL_MIN_INTERVAL_REFRESH_CASH > pThis->GetClockCount()){
-		printf("2");
 		return TRUE;
 	}
 
 	pcsAttachData->m_ulLastRefreshCashTimeMsec	= pThis->GetClockCount() + AGPMCASHMALL_MIN_INTERVAL_REFRESH_CASH;
 
 	// Request to billing server.
-	// EnumCallback(AGSMITEM_CB_USE_ITEM_REVERSE_ORB, pcsItem->m_pcsCharacter, pcsItem);
-
 	INT8 cOperation = AGPMCASH_OPERATION_REFRESH_CASH;
 	INT16 nPacketLength = 0;
-	INT32 lID = 0;
-	lID = pcsCharacter->m_lID;
-	printf("Making packet for '%s' (%d)\n", pcsCharacter->m_szID, pcsCharacter->m_lID);
 	PVOID pvPacket = pThis->m_pcsAgpmCashMall->m_csPacketRequestCash.MakePacket(
 		TRUE, 
 		&nPacketLength, 
 		AGPMCASHMALL_PACKET_TYPE,
-		&cOperation, // Remove the m_csPacketRequestCash definition WITHOUT operation first
+		&cOperation,
 		&pcsCharacter->m_szID,
 		&pcsCharacter->m_lID
 	);
@@ -188,23 +180,7 @@ BOOL AgsmCashMall::CBRefreshCash(PVOID pData, PVOID pClass, PVOID pCustData)
 	BOOL bResult = pThis->SendPacket(pvPacket, nPacketLength, pThis->_GetCharacterNID(pcsCharacter));
 	pThis->m_pcsAgpmCashMall->m_csPacketRequestCash.FreePacket(pvPacket);
 	
-
-
-
-
-	/*CashInfoGlobal pCash;
-	pThis->m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
-	printf("Increasing w from %f to %f\n", pCash.m_WCoin, pCash.m_WCoin + 5000.0);
-	printf("Increasing p from %f to %f\n", pCash.m_WCoin, pCash.m_PCoin + 5000.0);
-	pThis->m_pcsAgpmBillInfo->SetCashGlobal(pcsCharacter, pCash.m_WCoin + 5000.0, pCash.m_PCoin + 5000.0);
-
-	pThis->m_pcsAgpmBillInfo->GetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
-	printf("Now %f and %f\n", pCash.m_WCoin, pCash.m_PCoin);
-
-	PACKET_BILLINGINFO_CASHINFO pPacket(pcsCharacter->m_lID, pCash.m_WCoin, pCash.m_PCoin);
-	pThis->SendPacketUser(pPacket, pThis->m_pcsAgsmCharacter->GetCharDPNID(pcsCharacter));*/
-
-	return TRUE;
+	return bResult;
 }
 
 //	Helper
@@ -471,6 +447,8 @@ BOOL AgsmCashMall::ProcessBuyItem(AgpdCharacter *pcsCharacter, INT32 lProductID,
 				pCash.m_PCoin  = pCash.m_PCoin - pCashItemInfo->m_llPrice;
 				break;
 		}
+
+		// Call refresh instead maybe?
 		m_pcsAgpmBillInfo->SetCashGlobal(pcsCharacter, pCash.m_WCoin, pCash.m_PCoin);
 		PACKET_BILLINGINFO_CASHINFO pPacket(pcsCharacter->m_lID, pCash.m_WCoin, pCash.m_PCoin);
 		SendPacketUser(pPacket, m_pcsAgsmCharacter->GetCharDPNID(pcsCharacter));

@@ -1110,10 +1110,6 @@ INT16 AgsmCharManager::EnterGameWorld(AgpdCharacter *pcsCharacter, BOOL bIsCheck
 		*/
 
 		//m_pagsmCharacter->CheckRecvCharList(pcsCharacter->m_lID);
-	
-		// Set initial cash amount
-		// m_pagpmBillInfo->SetCashGlobal(pcsCharacter, 10000, 0);
-		// m_pcsAgpmCashMall->EnumCallback(AGPMCASH_CB_REFRESH_CASH, pcsCharacter, NULL);
 
 		// 이 character로 게임이 진행될거라는 패킷을 날려준다.
 		if (!SendCharacterSettingOK(pcsCharacter, pcsAgsdCharacter->m_dpnidCharacter))

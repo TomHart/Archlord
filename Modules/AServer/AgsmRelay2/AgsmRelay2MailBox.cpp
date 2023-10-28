@@ -283,7 +283,9 @@ BOOL AgsmRelay2::CBOperationMail(PVOID pData, PVOID pClass, PVOID pCustData)
 	pQuery->m_pParam = pAgsdRelay2;
 	pQuery->SetCallback(AgsmRelay2::CBFinishOperationMail,
 						AgsmRelay2::CBFailOperation,
-						pThis, pAgsdRelay2);
+						pThis,
+						pAgsdRelay2
+						);
 
 	return pThis->m_pAgsmDatabasePool->Execute(pQuery);
 	}

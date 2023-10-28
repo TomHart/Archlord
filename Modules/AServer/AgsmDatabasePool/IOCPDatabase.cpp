@@ -285,7 +285,7 @@ BOOL DBWorker::ExecuteQuery(AgsdQuery* pQuery)
 		INT32 lFailed = m_pIOCP->Failed();
 		AGSMTRACE("!!! Error : [%05d][%08d] Query Failed [%8d][%s]\n",
 					m_nIndex, GetId(), lFailed, pQuery->Get() ? pQuery->Get() : "");
-	
+					
 		GetLocalTime(&st);
 		sprintf(szLog, "LOG\\RelayServer_QueryError-%04d%02d%02d.log", st.wYear, st.wMonth, st.wDay);
 		

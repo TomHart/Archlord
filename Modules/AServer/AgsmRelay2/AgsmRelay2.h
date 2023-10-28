@@ -153,7 +153,6 @@ struct PACKET_AGSP_REFRESH_CASH_RELAY : public PACKET_HEADER
 	INT16 nParam;
 	INT16 nOperation;
 	CHAR strCharName[AGPACHARACTER_MAX_ID_STRING+1];
-	INT32 nCID;
 	INT32 nCoins;
 
 	PACKET_AGSP_REFRESH_CASH_RELAY()
@@ -166,13 +165,12 @@ struct PACKET_AGSP_REFRESH_CASH_RELAY : public PACKET_HEADER
 };
 struct PACKET_AGSP_REFRESH_CASH_RESULT_RELAY : public PACKET_AGSP_REFRESH_CASH_RELAY
 {
-	PACKET_AGSP_REFRESH_CASH_RESULT_RELAY(CHAR *CharName, INT32 Coins, INT32 CID)
+	PACKET_AGSP_REFRESH_CASH_RESULT_RELAY(CHAR *CharName, INT32 Coins)
 	{
 		nOperation = AGPMCASH_PACKET_OPERATION_REFRESH_CASH;
 		unPacketLength	= (UINT16)sizeof(PACKET_AGSP_REFRESH_CASH_RELAY);
 		strncpy(strCharName, CharName, AGPACHARACTER_MAX_ID_STRING);
 		nCoins = Coins;
-		nCID = CID;
 	}
 };
 
@@ -252,7 +250,6 @@ class AgsmRelay2 : public AgsModule
 		AuPacket m_csPacketMailItem;
 		AuPacket m_csPacketRowset;
 		AuPacket m_csPacketCashItemBuyList;
-		AuPacket m_csPacketRequestCash;
 		AuPacket m_csPacketWantedCriminal;
 		AuPacket m_csPacketCastle;
 		AuPacket m_csPacketSiege;
@@ -281,7 +278,6 @@ class AgsmRelay2 : public AgsModule
 		void	InitPacketBuddy();
 		void	InitPacketMail();
 		void	InitPacketCashItemBuyList();
-		void	InitPacketRequestCash();
 		void	InitPacketWantedCriminal();
 		void	InitPacketSiegeWar();
 		void	InitPacketGuildItem();

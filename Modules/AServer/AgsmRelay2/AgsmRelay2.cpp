@@ -76,7 +76,6 @@ AgsmRelay2::AgsmRelay2()
 	InitPacketBuddy();
 	InitPacketMail();
 	InitPacketCashItemBuyList();
-	InitPacketRequestCash();
 	InitPacketWantedCriminal();
 	InitPacketSiegeWar();
 	InitPacketGuildItem();

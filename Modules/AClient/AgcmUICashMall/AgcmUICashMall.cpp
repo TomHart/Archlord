@@ -582,7 +582,6 @@ BOOL AgcmUICashMall::RefreshCashEdit()
 #ifdef _AREA_GLOBAL_
 	CashInfoGlobal pCash;
 
-	// m_pagpmBillInfo->SetCashGlobal(m_pcsAgcmCharacter->GetSelfCharacter(), 100000, 100000);
 	m_pagpmBillInfo->GetCashGlobal(m_pcsAgcmCharacter->GetSelfCharacter(), pCash.m_WCoin, pCash.m_PCoin);
 
 	szBuffer.Format("%s : %d", m_pcsAgcmUIManager2->GetUIMessage(AGCMUIMESSAGE_CASHMALL_C_CASH), (INT64)pCash.m_WCoin);
